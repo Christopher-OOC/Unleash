@@ -7,6 +7,12 @@ import java.util.Map;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.IanaLinkRelations;
+import org.springframework.hateoas.PagedModel;
+import org.springframework.hateoas.PagedModel.PageMetadata;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -52,7 +58,8 @@ public class CourseApiController {
 	}
 
 	/**
-	 * Here, We can sort by course_code, course_name in any order but only filter by instructor_name
+	 * Here, We can sort by course_code, course_name in any order but only filter by
+	 * instructor_name
 	 */
 	@GetMapping
 	public ResponseEntity<?> listAllCourses(
@@ -60,23 +67,64 @@ public class CourseApiController {
 			@RequestParam(value = "size", required = false, defaultValue = "3") @Min(value = 1, message = "Page size must not be less than 1") @Max(value = 10, message = "Page size must not be greather than 10") int pageSize,
 			@RequestParam(value = "sort", required = false, defaultValue = "course_name") String sortOptions,
 			@RequestParam(value = "instructor_name", required = false, defaultValue = "") String filterField) {
-		
+
 		// Validate sort options
 		String[] arraySortOptions = sortOptions.split(",");
-		
+
 		for (String sortOption : arraySortOptions) {
 			String actualSortOption = sortOption.replace("-", "");
-			
+
 			if (!propertyMap.containsKey(actualSortOption)) {
 				throw new BadRequestException("Invalid sort field: " + actualSortOption);
 			}
 		}
-		
-		
 
-		Page<Course> allCourses = courseService.getAllCourses(pageNum - 1, pageSize, sortOptions, filterField);
+		Page<Course> pageCourses = courseService.getAllCourses(pageNum - 1, pageSize, sortOptions, filterField);
 
-		return ResponseEntity.ok(listEntityToListDto(allCourses.getContent()));
+		int size = pageCourses.getSize();
+		int number = pageCourses.getNumber();
+		long totalElements = pageCourses.getTotalElements();
+		int totalPages = pageCourses.getTotalPages();
+
+		PageMetadata metadata = new PageMetadata(size, number + 1, totalElements, totalPages);
+
+		List<Course> listContent = pageCourses.getContent();
+
+		List<CourseDto> dtos = listEntityToListDto(listContent);
+
+		addSelfLinksToCourses(dtos);
+
+		CollectionModel<CourseDto> collectionModel = PagedModel.of(dtos, metadata);
+
+		addNavigationLiksToCollectionModel(collectionModel, pageNum, pageSize, sortOptions, filterField, totalPages);
+
+		return ResponseEntity.ok(collectionModel);
+	}
+
+	private void addNavigationLiksToCollectionModel(CollectionModel<CourseDto> collectionModel, int pageNum,
+			int pageSize, String sortOptions, String filterField, int totalPages) {
+		
+		// Add self link
+		collectionModel.add(linkTo(methodOn(getClass()).listAllCourses(pageNum, pageSize, sortOptions, filterField)).withSelfRel());
+		
+		if (pageNum < totalPages) {
+			collectionModel.add(linkTo(methodOn(getClass()).listAllCourses(pageNum + 1, pageSize, sortOptions, filterField)).withRel(IanaLinkRelations.NEXT));
+		
+			collectionModel.add(linkTo(methodOn(getClass()).listAllCourses(totalPages, pageSize, sortOptions, filterField)).withRel(IanaLinkRelations.LAST));
+		}
+		
+		if (pageNum > 1) {
+			
+			collectionModel.add(linkTo(methodOn(getClass()).listAllCourses(pageNum - 1, pageSize, sortOptions, filterField)).withRel(IanaLinkRelations.PREV));
+		}
+		
+	}
+
+	private void addSelfLinksToCourses(List<CourseDto> dtos) {
+		dtos.forEach(dto -> {
+			dto.add(linkTo(methodOn(getClass()).getCourseById(dto.getCourseId())).withSelfRel());
+		});
+
 	}
 
 	@GetMapping("/{courseId}")

@@ -68,7 +68,7 @@ public class FilterCourseRepositoryImpl implements FilterCourseRepository {
 		return page;
 	}
 
-	private void addFilterByFitlerField(String filterField, CriteriaBuilder builder, CriteriaQuery<Course> query,
+	private void addFilterByFitlerField(String filterField, CriteriaBuilder builder, CriteriaQuery<?> query,
 			Root<Course> root) {
 		if (!"".equals(filterField)) {
 			Predicate predicate = builder.like(root.get("instructor").get("fullName"), "%" + filterField + "%");
@@ -76,21 +76,13 @@ public class FilterCourseRepositoryImpl implements FilterCourseRepository {
 		}
 	}
 	
-	private void addFilterByFitlerFieldLong(String filterField, CriteriaBuilder builder, CriteriaQuery<Long> query,
-			Root<Course> root) {
-		if (!"".equals(filterField)) {
-			Predicate predicate = builder.like(root.get("instructor").get("fullName"), "%" + filterField + "%");
-			query.where(predicate);
-		}
-	}
-
 	private long generateTotalRows(Pageable pageable, String filterField) {
 		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 		CriteriaQuery<Long> query = builder.createQuery(Long.class);
 		
 		Root<Course> root = query.from(Course.class);
 		
-		addFilterByFitlerFieldLong(filterField, builder, query, root);
+		addFilterByFitlerField(filterField, builder, query, root);
 		
 		query.select(builder.count(root));
 		

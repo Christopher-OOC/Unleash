@@ -4,6 +4,8 @@ import java.util.Date;
 import java.util.Objects;
 
 import org.hibernate.validator.constraints.Length;
+import org.springframework.hateoas.RepresentationModel;
+import org.springframework.hateoas.server.core.Relation;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -17,7 +19,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @JsonPropertyOrder({"courseId", "courseCode", "courseName", "instructorId", "dateCreated"})
-public class CourseDto {
+@Relation(collectionRelation="courses")
+public class CourseDto extends RepresentationModel<CourseDto> {
 	
 	@JsonProperty("course_id")
 	private int courseId;
