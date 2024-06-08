@@ -110,7 +110,7 @@ public class CourseApiController {
 		if (pageNum < totalPages) {
 			collectionModel.add(linkTo(methodOn(getClass()).listAllCourses(pageNum + 1, pageSize, sortOptions, filterField)).withRel(IanaLinkRelations.NEXT));
 		
-			collectionModel.add(linkTo(methodOn(getClass()).listAllCourses(totalPages, pageSize, sortOptions, filterField)).withRel(IanaLinkRelations.LAST));
+			 collectionModel.add(linkTo(methodOn(getClass()).listAllCourses(totalPages, pageSize, sortOptions, filterField)).withRel(IanaLinkRelations.LAST));
 		}
 		
 		if (pageNum > 1) {
