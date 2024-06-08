@@ -131,8 +131,12 @@ public class CourseApiController {
 	public ResponseEntity<?> getCourseById(
 			@PathVariable("courseId") @Positive(message = "courseId must be positive") int courseId) {
 		Course course = courseService.getCourseById(courseId);
+		
+		CourseDto dto = entityToDto(course);
+		
+		addSelfLinksToCourses(List.of(dto));
 
-		return ResponseEntity.ok(entityToDto(course));
+		return ResponseEntity.ok(dto);
 	}
 
 	@PostMapping("/exams/{courseId}")
