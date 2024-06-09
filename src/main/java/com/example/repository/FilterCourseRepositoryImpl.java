@@ -28,7 +28,7 @@ public class FilterCourseRepositoryImpl implements FilterCourseRepository {
 	private EntityManager entityManager;
 	
 	@Override
-	public Page<Course> getAllCourses(Pageable pageable, String filterField) {
+	public Page<Course> getAllCourses(Pageable pageable, String search) {
 		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 		CriteriaQuery<Course> query = builder.createQuery(Course.class);
 		
@@ -48,10 +48,12 @@ public class FilterCourseRepositoryImpl implements FilterCourseRepository {
 		
 		query.orderBy(orderList);
 		
-		// Filter
+		// Search
 		
 		//check if value is not empty String
-		addFilterByFitlerField(filterField, builder, query, root);
+		if (!"".equals(search)) {
+			addFilterByFitlerField(search, builder, query, root);
+		}
 		
 		TypedQuery<Course> typedQuery = entityManager.createQuery(query);
 		typedQuery.setFirstResult((int)pageable.getOffset());
@@ -59,7 +61,7 @@ public class FilterCourseRepositoryImpl implements FilterCourseRepository {
 		
 		List<Course> courses = typedQuery.getResultList();
 		
-		long totalRows = generateTotalRows(pageable, filterField);
+		long totalRows = generateTotalRows(pageable, search);
 		
 		log.info("TOTAL ROWS: {}", totalRows);
 		
@@ -68,21 +70,24 @@ public class FilterCourseRepositoryImpl implements FilterCourseRepository {
 		return page;
 	}
 
-	private void addFilterByFitlerField(String filterField, CriteriaBuilder builder, CriteriaQuery<?> query,
+	private void addFilterByFitlerField(String search, CriteriaBuilder builder, CriteriaQuery<?> query,
 			Root<Course> root) {
-		if (!"".equals(filterField)) {
-			Predicate predicate = builder.like(root.get("instructor").get("fullName"), "%" + filterField + "%");
-			query.where(predicate);
-		}
+		
+		Predicate predicate1 = builder.like(root.get("courseName"), "%" + search + "%");
+		Predicate predicate2 = builder.like(root.get("courseCode"), "%" + search + "%");
+		Predicate predicate3 = builder.like(root.get("instructor").get("fullName"), "%" + search + "%");
+		
+		Predicate allPredicates = builder.or(predicate1, predicate2, predicate3);
+		query.where(allPredicates);
 	}
 	
-	private long generateTotalRows(Pageable pageable, String filterField) {
+	private long generateTotalRows(Pageable pageable, String search) {
 		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 		CriteriaQuery<Long> query = builder.createQuery(Long.class);
 		
 		Root<Course> root = query.from(Course.class);
 		
-		addFilterByFitlerField(filterField, builder, query, root);
+		addFilterByFitlerField(search, builder, query, root);
 		
 		query.select(builder.count(root));
 		

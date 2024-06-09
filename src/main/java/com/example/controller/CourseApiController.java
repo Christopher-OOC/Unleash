@@ -1,6 +1,5 @@
 package com.example.controller;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -17,21 +16,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.exceptions.BadRequestException;
 import com.example.model.Course;
-import com.example.model.ExaminationSession;
 import com.example.model.dto.CourseDto;
-import com.example.model.dto.ExaminationSessionDto;
 import com.example.service.CourseService;
 import com.example.service.ExaminationSessionService;
 
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Positive;
@@ -45,8 +39,6 @@ public class CourseApiController {
 
 	private ModelMapper modelMapper;
 
-	private ExaminationSessionService examinationSessionService;
-
 	private Map<String, Object> propertyMap = Map.of("course_code", "courseCode", "course_name", "courseName");
 
 	public CourseApiController(CourseService courseService, ExaminationSessionService examinationSessionService,
@@ -54,7 +46,6 @@ public class CourseApiController {
 		super();
 		this.courseService = courseService;
 		this.modelMapper = modelMapper;
-		this.examinationSessionService = examinationSessionService;
 	}
 
 	/**
@@ -66,7 +57,8 @@ public class CourseApiController {
 			@RequestParam(value = "page", required = false, defaultValue = "1") @Min(value = 1, message = "Page number must not be less than 1") int pageNum,
 			@RequestParam(value = "size", required = false, defaultValue = "3") @Min(value = 1, message = "Page size must not be less than 1") @Max(value = 10, message = "Page size must not be greather than 10") int pageSize,
 			@RequestParam(value = "sort", required = false, defaultValue = "course_name") String sortOptions,
-			@RequestParam(value = "instructor_name", required = false, defaultValue = "") String filterField) {
+			@RequestParam(value = "search", required = false, defaultValue = "") String search
+			) {
 
 		// Validate sort options
 		String[] arraySortOptions = sortOptions.split(",");
@@ -79,7 +71,7 @@ public class CourseApiController {
 			}
 		}
 
-		Page<Course> pageCourses = courseService.getAllCourses(pageNum - 1, pageSize, sortOptions, filterField);
+		Page<Course> pageCourses = courseService.getAllCourses(pageNum - 1, pageSize, sortOptions, search);
 
 		int size = pageCourses.getSize();
 		int number = pageCourses.getNumber();
@@ -96,7 +88,7 @@ public class CourseApiController {
 
 		CollectionModel<CourseDto> collectionModel = PagedModel.of(dtos, metadata);
 
-		addNavigationLiksToCollectionModel(collectionModel, pageNum, pageSize, sortOptions, filterField, totalPages);
+		addNavigationLiksToCollectionModel(collectionModel, pageNum, pageSize, sortOptions, search, totalPages);
 
 		return ResponseEntity.ok(collectionModel);
 	}
@@ -137,17 +129,6 @@ public class CourseApiController {
 		addSelfLinksToCourses(List.of(dto));
 
 		return ResponseEntity.ok(dto);
-	}
-
-	@PostMapping("/exams/{courseId}")
-	public ResponseEntity<?> createAnExaminaionSession(@RequestBody @Valid ExaminationSessionDto dto,
-			@PathVariable("courseId") @Valid int courseId) {
-
-		ExaminationSession savedExamSession = examinationSessionService.createExamSessionForACourse(dto, courseId);
-
-		URI uri = URI.create("/v1/courses/" + courseId + "/" + savedExamSession.getExaminationSessionId());
-
-		return ResponseEntity.created(uri).body(modelMapper.map(savedExamSession, ExaminationSessionDto.class));
 	}
 
 	private CourseDto entityToDto(Course course) {

@@ -15,6 +15,6 @@ public interface CourseService {
 	@Deprecated
 	List<Course> getAllCourses();
 	
-	Page<Course> getAllCourses(int pageNum, int pageSize, String sortFields, String filterField);
+	Page<Course> getAllCourses(int pageNum, int pageSize, String sortFields, String search);
 
 }

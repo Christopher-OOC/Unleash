@@ -7,6 +7,6 @@ import com.example.model.Course;
 
 public interface FilterCourseRepository {
 	
-	Page<Course> getAllCourses(Pageable pageable, String filterField);
+	Page<Course> getAllCourses(Pageable pageable, String search);
 
 }

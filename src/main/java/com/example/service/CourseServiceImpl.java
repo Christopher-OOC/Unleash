@@ -80,7 +80,7 @@ public class CourseServiceImpl implements CourseService {
 	}
 	
 	@Override
-	public Page<Course> getAllCourses(int pageNum, int pageSize, String sortFields, String filterField) {
+	public Page<Course> getAllCourses(int pageNum, int pageSize, String sortFields, String search) {
 		// initialize sort
 		Sort sort = Sort.unsorted();
 		
@@ -100,7 +100,7 @@ public class CourseServiceImpl implements CourseService {
 		
 		Pageable pageable = PageRequest.of(pageNum, pageSize, sort);
 		
-		return courseRepository.getAllCourses(pageable, filterField);
+		return courseRepository.getAllCourses(pageable, search);
 	}
 
 }
