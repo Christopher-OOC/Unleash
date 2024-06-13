@@ -3,7 +3,7 @@ package com.example.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import com.example.model.ExaminationSession;
+import com.example.model.entity.ExaminationSession;
 
 public interface ExaminationSessionRepository extends JpaRepository<ExaminationSession, Integer> {
 	

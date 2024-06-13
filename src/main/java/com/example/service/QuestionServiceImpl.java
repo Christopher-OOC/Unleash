@@ -9,9 +9,9 @@ import org.springframework.stereotype.Service;
 import com.example.exceptions.NoQuestionAvailableForTheCourseException;
 import com.example.exceptions.NoSuchCourseFoundException;
 import com.example.exceptions.NoSuchQuestionFoundException;
-import com.example.model.Course;
-import com.example.model.Question;
 import com.example.model.dto.QuestionDto;
+import com.example.model.entity.Course;
+import com.example.model.entity.Question;
 import com.example.repository.CourseRepository;
 import com.example.repository.QuestionRepository;
 
@@ -70,7 +70,7 @@ public class QuestionServiceImpl implements QuestionService {
 		Optional<Course> optional = courseRepository.findById(courseId);
 		
 		if (optional.isEmpty()) {
-			throw new NoSuchCourseFoundException(courseId);
+			throw new NoSuchCourseFoundException("" + courseId);
 		}
 		
 		return optional.get();

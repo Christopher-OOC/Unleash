@@ -4,7 +4,7 @@ public class NoSuchCourseFoundException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 
-	public NoSuchCourseFoundException(int courseId) {
+	public NoSuchCourseFoundException(String courseId) {
 		super("No course found with courseId: " + courseId);
 	}
 }

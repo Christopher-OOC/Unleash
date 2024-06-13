@@ -1,4 +1,4 @@
-package com.example.model;
+package com.example.model.entity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;

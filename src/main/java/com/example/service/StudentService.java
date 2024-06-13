@@ -2,8 +2,8 @@ package com.example.service;
 
 import java.util.List;
 
-import com.example.model.Course;
-import com.example.model.Student;
+import com.example.model.entity.Course;
+import com.example.model.entity.Student;
 
 public interface StudentService {
 	

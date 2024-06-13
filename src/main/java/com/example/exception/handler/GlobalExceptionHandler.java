@@ -29,6 +29,7 @@ import com.example.exceptions.NoSuchInstructorException;
 import com.example.exceptions.NoSuchQuestionFoundException;
 import com.example.exceptions.NoSuchStudentFoundException;
 import com.example.exceptions.NotRegisteredForTheCourseException;
+import com.example.exceptions.PasswordNotTheSameException;
 import com.example.model.dto.ErrorDto;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -182,6 +183,21 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		ErrorDto error = new ErrorDto();
 		
 		error.setStatus(HttpStatus.NOT_FOUND.value());
+		error.setPath(request.getServletPath());		
+		error.getMessages().add(ex.getMessage());
+		
+		return error;
+		
+	}
+	
+	@ExceptionHandler(PasswordNotTheSameException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ResponseBody
+	public ErrorDto handlePasswordNotTheSameException(HttpServletRequest request, PasswordNotTheSameException ex) {
+		
+		ErrorDto error = new ErrorDto();
+		
+		error.setStatus(HttpStatus.BAD_REQUEST.value());
 		error.setPath(request.getServletPath());		
 		error.getMessages().add(ex.getMessage());
 		

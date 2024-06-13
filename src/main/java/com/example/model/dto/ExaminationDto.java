@@ -6,8 +6,8 @@ import java.util.Objects;
 
 import org.springframework.hateoas.RepresentationModel;
 
-import com.example.model.ExaminationQuestionAnswer;
-import com.example.model.Question;
+import com.example.model.entity.ExaminationQuestionAnswer;
+import com.example.model.entity.Question;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;

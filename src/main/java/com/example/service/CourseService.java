@@ -4,17 +4,15 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 
-import com.example.model.Course;
+import com.example.model.dto.CourseDto;
+import com.example.model.entity.Course;
 
 public interface CourseService {
 	
 	Course addNewCourse(Course course, int instructorId);
 	
-	Course getCourseById(int courseId);
+	CourseDto getCourseById(String courseId);
 	
-	@Deprecated
-	List<Course> getAllCourses();
-	
-	Page<Course> getAllCourses(int pageNum, int pageSize, String sortFields, String search);
+	Page<CourseDto> getAllCourses(int pageNum, int pageSize, String sortFields, String search);
 
 }

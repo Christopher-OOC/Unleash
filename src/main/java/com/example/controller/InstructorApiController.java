@@ -14,15 +14,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.model.Course;
-import com.example.model.ExaminationSession;
-import com.example.model.Instructor;
+import com.example.exceptions.PasswordNotTheSameException;
 import com.example.model.dto.CourseDto;
 import com.example.model.dto.ExaminationSessionDto;
 import com.example.model.dto.InstructorDto;
+import com.example.model.entity.Course;
+import com.example.model.entity.ExaminationSession;
+import com.example.model.entity.Instructor;
+import com.example.model.requestmodel.InstructorRequestModel;
 import com.example.service.CourseService;
 import com.example.service.ExaminationSessionService;
 import com.example.service.InstructorService;
+import com.example.utilities.PublicIdGeneratorUtils;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
@@ -50,16 +53,25 @@ public class InstructorApiController {
 	}
 
 	@PostMapping
-	public ResponseEntity<?> registerAsAnInstructor(@RequestBody @Valid InstructorDto InstructorDto) {
-		Instructor instructor = instructorDtoToEntity(InstructorDto);
+	public ResponseEntity<?> registerAsAnInstructor(@RequestBody @Valid InstructorRequestModel requestModel) {
+		// Check if password and confirmPassword are the same
+		
+		if (!requestModel.getPassword().equals(requestModel.getConfirmPassword())) {
+			throw new PasswordNotTheSameException();
+		}
+		
+		InstructorDto dto = modelMapper.map(requestModel, InstructorDto.class);
+		
+		//Generate instructorId
+		dto.setInstructorId(PublicIdGeneratorUtils.generateId(30));
 
-		Instructor savedInstructor = instructorService.save(instructor);
+//		Instructor savedInstructor = instructorService.save(instructor);
+//
+//		InstructorDto dto = instructorEntityToDto(savedInstructor);
+//
+//		URI uri = URI.create("/v1/instructors/" + dto.getInstructorId());
 
-		InstructorDto dto = instructorEntityToDto(savedInstructor);
-
-		URI uri = URI.create("/v1/instructors/" + dto.getInstructorId());
-
-		return ResponseEntity.created(uri).body(dto);
+		return null;//ResponseEntity.created(uri).body(dto);
 	}
 
 	@PostMapping("/{instructorId}/courses")

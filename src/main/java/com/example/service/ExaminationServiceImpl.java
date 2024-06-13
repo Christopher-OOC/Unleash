@@ -17,18 +17,18 @@ import com.example.controller.ExaminationApiController;
 import com.example.exceptions.NoExaminationFoundException;
 import com.example.exceptions.NoExaminationSessionException;
 import com.example.exceptions.NoOngoingExaminationException;
-import com.example.model.Course;
-import com.example.model.Examination;
-import com.example.model.ExaminationId;
-import com.example.model.ExaminationQuestionAnswer;
-import com.example.model.ExaminationQuestionOption;
-import com.example.model.ExaminationSession;
-import com.example.model.Question;
-import com.example.model.QuestionOption;
-import com.example.model.Student;
 import com.example.model.dto.ExaminationDto;
 import com.example.model.dto.ExaminationQuestionAnswerDto;
 import com.example.model.dto.ExaminationResultDto;
+import com.example.model.entity.Course;
+import com.example.model.entity.Examination;
+import com.example.model.entity.ExaminationId;
+import com.example.model.entity.ExaminationQuestionAnswer;
+import com.example.model.entity.ExaminationQuestionOption;
+import com.example.model.entity.ExaminationSession;
+import com.example.model.entity.Question;
+import com.example.model.entity.QuestionOption;
+import com.example.model.entity.Student;
 import com.example.repository.CourseRepository;
 import com.example.repository.ExaminationQuestionAnswerRepository;
 import com.example.repository.ExaminationRepository;
@@ -141,7 +141,7 @@ public class ExaminationServiceImpl implements ExaminationService {
 		Optional<Course> optionalCourse = courseRepository.findById(courseId);
 
 		if (optionalCourse.isEmpty()) {
-			throw new NoSuchCourseFoundException(courseId);
+			throw new NoSuchCourseFoundException("" + courseId);
 		}
 		
 		return optionalCourse.get();

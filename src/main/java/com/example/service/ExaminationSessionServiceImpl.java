@@ -6,9 +6,9 @@ import org.springframework.stereotype.Service;
 
 import com.example.exceptions.ExaminationSessionAlreadyCreated;
 import com.example.exceptions.NoSuchCourseFoundException;
-import com.example.model.Course;
-import com.example.model.ExaminationSession;
 import com.example.model.dto.ExaminationSessionDto;
+import com.example.model.entity.Course;
+import com.example.model.entity.ExaminationSession;
 import com.example.repository.CourseRepository;
 import com.example.repository.ExaminationSessionRepository;
 
@@ -55,7 +55,7 @@ public class ExaminationSessionServiceImpl implements ExaminationSessionService 
 		Optional<Course> optional = courseRepository.findById(courseId);
 		
 		if (optional.isEmpty()) {
-			throw new NoSuchCourseFoundException(courseId);
+			throw new NoSuchCourseFoundException("" + courseId);
 		}
 		
 		Course course = optional.get();

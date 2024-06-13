@@ -1,4 +1,4 @@
-package com.example.model;
+package com.example.model.entity;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -29,7 +29,10 @@ public class Instructor {
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	private int instructorId;
+	private int id;
+	
+	@Column(length=30, nullable=false)
+	private String instructorId;
 	
 	@Column(length=50)
 	private String fullName;
@@ -46,7 +49,7 @@ public class Instructor {
 	@Temporal(TemporalType.DATE)
 	private Date dateRegistered;
 	
-	public Instructor instructorId(int id) {
+	public Instructor instructorId(String id) {
 		setInstructorId(id);
 		
 		return this;

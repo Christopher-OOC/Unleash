@@ -1,7 +1,7 @@
 package com.example.service;
 
-import com.example.model.ExaminationSession;
 import com.example.model.dto.ExaminationSessionDto;
+import com.example.model.entity.ExaminationSession;
 
 public interface ExaminationSessionService {
 	

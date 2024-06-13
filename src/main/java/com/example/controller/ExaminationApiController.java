@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.model.Examination;
 import com.example.model.dto.ExaminationDto;
 import com.example.model.dto.ExaminationResultDto;
+import com.example.model.entity.Examination;
 import com.example.service.ExaminationService;
 
 @RestController

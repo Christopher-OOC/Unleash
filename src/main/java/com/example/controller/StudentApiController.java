@@ -1,6 +1,7 @@
 package com.example.controller;
 
 import java.net.URI;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,12 +14,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.model.Course;
-import com.example.model.Student;
 import com.example.model.dto.CourseDto;
 import com.example.model.dto.StudentDto;
+import com.example.model.entity.Course;
+import com.example.model.entity.Student;
 import com.example.service.StudentService;
-import com.example.utilities.ModelMapperUtils;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
@@ -31,13 +31,11 @@ public class StudentApiController {
 
 	private ModelMapper modelMapper;
 
-	private ModelMapperUtils utils;
-
-	public StudentApiController(StudentService studentService, ModelMapper modelMapper, ModelMapperUtils utils) {
+	public StudentApiController(StudentService studentService, ModelMapper modelMapper) {
 		super();
 		this.studentService = studentService;
 		this.modelMapper = modelMapper;
-		this.utils = utils;
+	
 	}
 
 	@PostMapping
@@ -57,7 +55,7 @@ public class StudentApiController {
 		Student student = studentService.getById(studentId);
 
 		//StudentDto dto = modelMapper.map(student, StudentDto.class);
-		StudentDto dto = utils.studentEntityToDto(student);
+		StudentDto dto = null;//utils.studentEntityToDto(student);
 		return ResponseEntity.ok(dto);
 	}
 

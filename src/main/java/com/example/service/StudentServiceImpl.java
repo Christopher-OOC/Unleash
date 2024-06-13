@@ -10,8 +10,8 @@ import com.example.exceptions.NoCourseAvailableException;
 import com.example.exceptions.NoStudentAvailableException;
 import com.example.exceptions.NoSuchCourseFoundException;
 import com.example.exceptions.NoSuchStudentFoundException;
-import com.example.model.Course;
-import com.example.model.Student;
+import com.example.model.entity.Course;
+import com.example.model.entity.Student;
 import com.example.repository.CourseRepository;
 import com.example.repository.StudentRepository;
 
@@ -53,7 +53,7 @@ public class StudentServiceImpl implements StudentService {
 		Optional<Course> optional = courseRepository.findById(courseId);
 
 		if (optional.isEmpty()) {
-			throw new NoSuchCourseFoundException(courseId);
+			throw new NoSuchCourseFoundException("" + courseId);
 		}
 
 		return optional.get();

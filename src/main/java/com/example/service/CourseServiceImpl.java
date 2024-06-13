@@ -4,7 +4,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -13,8 +16,9 @@ import org.springframework.stereotype.Service;
 import com.example.exceptions.NoCourseAvailableException;
 import com.example.exceptions.NoSuchCourseFoundException;
 import com.example.exceptions.NoSuchInstructorException;
-import com.example.model.Course;
-import com.example.model.Instructor;
+import com.example.model.dto.CourseDto;
+import com.example.model.entity.Course;
+import com.example.model.entity.Instructor;
 import com.example.repository.CourseRepository;
 import com.example.repository.InstructorRepository;
 
@@ -25,12 +29,16 @@ public class CourseServiceImpl implements CourseService {
 	
 	private InstructorRepository instructorRepository;
 	
+	private ModelMapper modelMapper;
+	
 	private Map<String, Object> propertyMap = Map.of("course_code", "courseCode", "course_name", "courseName");
 
-	public CourseServiceImpl(CourseRepository courseRepository, InstructorRepository instructorRepository) {
+	public CourseServiceImpl(CourseRepository courseRepository, InstructorRepository instructorRepository, 
+			ModelMapper modelMapper) {
 		super();
 		this.courseRepository = courseRepository;
 		this.instructorRepository = instructorRepository;
+		this.modelMapper = modelMapper;
 	}
 	
 	@Override
@@ -53,34 +61,24 @@ public class CourseServiceImpl implements CourseService {
 	}
 
 	@Override
-	public Course getCourseById(int courseId) {
+	public CourseDto getCourseById(String courseId) {
 		return checkIfCourseExists(courseId);
 	}
 
-	private Course checkIfCourseExists(int courseId) {
-		Optional<Course> optional = courseRepository.findById(courseId);
+	private CourseDto checkIfCourseExists(String courseId) {
+		Optional<Course> optional = courseRepository.findByCourseId(courseId);
 		
 		if (optional.isEmpty()) {
 			throw new NoSuchCourseFoundException(courseId);
 		}
 		
-		return optional.get();
+		Course course = optional.get();
+		
+		return modelMapper.map(course, CourseDto.class);
 	}
 
 	@Override
-	@Deprecated
-	public List<Course> getAllCourses() {
-		List<Course> list = courseRepository.findAll();
-		
-		if (list == null) {
-			throw new NoCourseAvailableException("No courses available");
-		}
-		
-		return list;
-	}
-	
-	@Override
-	public Page<Course> getAllCourses(int pageNum, int pageSize, String sortFields, String filterField) {
+	public Page<CourseDto> getAllCourses(int pageNum, int pageSize, String sortFields, String filterField) {
 		// initialize sort
 		Sort sort = Sort.unsorted();
 		
@@ -97,10 +95,17 @@ public class CourseServiceImpl implements CourseService {
 			}
 		}
 		
-		
 		Pageable pageable = PageRequest.of(pageNum, pageSize, sort);
 		
-		return courseRepository.getAllCourses(pageable, filterField);
+		Page<Course> returnPage = courseRepository.getAllCourses(pageable, filterField);
+		
+		List<Course> list = returnPage.getContent();
+		
+		java.lang.reflect.Type typeToken = new TypeToken<List<CourseDto>> () {}.getType();
+		
+		List<CourseDto> listDto = modelMapper.map(list, typeToken);
+		
+		return new PageImpl<CourseDto>(listDto, pageable, returnPage.getTotalElements());
 	}
 
 }

@@ -1,4 +1,4 @@
-package com.example.model;
+package com.example.model.entity;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -31,8 +31,10 @@ public class Course {
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	@Column(name="course_id")
-	private int courseId;
+	private int id;
+	
+	@Column(length=30, nullable=false)
+	private String courseId;
 	
 	@Column(length=10, unique=true)
 	private String courseCode;
@@ -54,7 +56,7 @@ public class Course {
 	@Temporal(TemporalType.DATE)
 	private Date dateCreated;
 	
-	public Course getInstanceWithId(int id) {
+	public Course getInstanceWithId(String id) {
 		Instructor instuctor = new Instructor();
 		instuctor.setInstructorId(id);
 		
@@ -78,6 +80,12 @@ public class Course {
 	@Override
 	public int hashCode() {
 		return Objects.hash(courseId);
+	}
+
+	@Override
+	public String toString() {
+		return "Course [courseId=" + courseId + ", courseCode=" + courseCode + ", courseName=" + courseName
+				+ ", studentEnrolled=" + studentEnrolled + ", dateCreated=" + dateCreated + "]";
 	}
 	
 	

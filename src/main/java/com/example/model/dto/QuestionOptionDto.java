@@ -2,7 +2,7 @@ package com.example.model.dto;
 
 import java.util.Objects;
 
-import com.example.model.Question;
+import com.example.model.entity.Question;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 

@@ -21,14 +21,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.exceptions.BadRequestException;
-import com.example.model.Course;
 import com.example.model.dto.CourseDto;
+import com.example.model.responsemodel.CourseResponseModel;
 import com.example.service.CourseService;
 import com.example.service.ExaminationSessionService;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Positive;
 
 @RestController
 @RequestMapping("/v1/courses")
@@ -48,17 +47,12 @@ public class CourseApiController {
 		this.modelMapper = modelMapper;
 	}
 
-	/**
-	 * Here, We can sort by course_code, course_name in any order but only filter by
-	 * instructor_name
-	 */
 	@GetMapping
 	public ResponseEntity<?> listAllCourses(
 			@RequestParam(value = "page", required = false, defaultValue = "1") @Min(value = 1, message = "Page number must not be less than 1") int pageNum,
 			@RequestParam(value = "size", required = false, defaultValue = "3") @Min(value = 1, message = "Page size must not be less than 1") @Max(value = 10, message = "Page size must not be greather than 10") int pageSize,
 			@RequestParam(value = "sort", required = false, defaultValue = "course_name") String sortOptions,
-			@RequestParam(value = "search", required = false, defaultValue = "") String search
-			) {
+			@RequestParam(value = "search", required = false, defaultValue = "") String search) {
 
 		// Validate sort options
 		String[] arraySortOptions = sortOptions.split(",");
@@ -71,7 +65,7 @@ public class CourseApiController {
 			}
 		}
 
-		Page<Course> pageCourses = courseService.getAllCourses(pageNum - 1, pageSize, sortOptions, search);
+		Page<CourseDto> pageCourses = courseService.getAllCourses(pageNum - 1, pageSize, sortOptions, search);
 
 		int size = pageCourses.getSize();
 		int number = pageCourses.getNumber();
@@ -80,78 +74,73 @@ public class CourseApiController {
 
 		PageMetadata metadata = new PageMetadata(size, number + 1, totalElements, totalPages);
 
-		List<Course> listContent = pageCourses.getContent();
+		List<CourseDto> listDto = pageCourses.getContent();
 
-		List<CourseDto> dtos = listEntityToListDto(listContent);
+		List<CourseResponseModel> listResponse = listDtoToListResponse(listDto);
 
-		addSelfLinksToCourses(dtos);
+		addSelfLinksToCourses(listResponse);
 
-		CollectionModel<CourseDto> collectionModel = PagedModel.of(dtos, metadata);
+		CollectionModel<CourseResponseModel> collectionModel = PagedModel.of(listResponse, metadata);
 
 		addNavigationLiksToCollectionModel(collectionModel, pageNum, pageSize, sortOptions, search, totalPages);
 
 		return ResponseEntity.ok(collectionModel);
 	}
 
-	private void addNavigationLiksToCollectionModel(CollectionModel<CourseDto> collectionModel, int pageNum,
-			int pageSize, String sortOptions, String filterField, int totalPages) {
-		
-		// Add self link
-		collectionModel.add(linkTo(methodOn(getClass()).listAllCourses(pageNum, pageSize, sortOptions, filterField)).withSelfRel());
-		
-		if (pageNum < totalPages) {
-			collectionModel.add(linkTo(methodOn(getClass()).listAllCourses(pageNum + 1, pageSize, sortOptions, filterField)).withRel(IanaLinkRelations.NEXT));
-		
-			 collectionModel.add(linkTo(methodOn(getClass()).listAllCourses(totalPages, pageSize, sortOptions, filterField)).withRel(IanaLinkRelations.LAST));
+	private List<CourseResponseModel> listDtoToListResponse(List<CourseDto> listDto) {
+		List<CourseResponseModel> listResponse = new ArrayList<>();
+
+		for (CourseDto dto : listDto) {
+			CourseResponseModel response = modelMapper.map(dto, CourseResponseModel.class);
+			response.setNumberOfStudentEnrolled(dto.getStudentEnrolled().size());
+			listResponse.add(response);
 		}
-		
-		if (pageNum > 1) {
-			
-			collectionModel.add(linkTo(methodOn(getClass()).listAllCourses(pageNum - 1, pageSize, sortOptions, filterField)).withRel(IanaLinkRelations.PREV));
-		}
-		
+
+		return listResponse;
 	}
 
-	private void addSelfLinksToCourses(List<CourseDto> dtos) {
-		dtos.forEach(dto -> {
-			dto.add(linkTo(methodOn(getClass()).getCourseById(dto.getCourseId())).withSelfRel());
+	private void addNavigationLiksToCollectionModel(CollectionModel<CourseResponseModel> collectionModel, int pageNum,
+			int pageSize, String sortOptions, String filterField, int totalPages) {
+
+		// Add self link
+		collectionModel.add(
+				linkTo(methodOn(getClass()).listAllCourses(pageNum, pageSize, sortOptions, filterField)).withSelfRel());
+
+		if (pageNum < totalPages) {
+			collectionModel
+					.add(linkTo(methodOn(getClass()).listAllCourses(pageNum + 1, pageSize, sortOptions, filterField))
+							.withRel(IanaLinkRelations.NEXT));
+
+			collectionModel
+					.add(linkTo(methodOn(getClass()).listAllCourses(totalPages, pageSize, sortOptions, filterField))
+							.withRel(IanaLinkRelations.LAST));
+		}
+
+		if (pageNum > 1) {
+
+			collectionModel
+					.add(linkTo(methodOn(getClass()).listAllCourses(pageNum - 1, pageSize, sortOptions, filterField))
+							.withRel(IanaLinkRelations.PREV));
+		}
+
+	}
+
+	private void addSelfLinksToCourses(List<CourseResponseModel> listResponse) {
+		listResponse.forEach(courseResponse -> {
+			courseResponse.add(linkTo(methodOn(getClass()).getCourseById(courseResponse.getCourseId())).withSelfRel());
 		});
 
 	}
 
 	@GetMapping("/{courseId}")
-	public ResponseEntity<?> getCourseById(
-			@PathVariable("courseId") @Positive(message = "courseId must be positive") int courseId) {
-		Course course = courseService.getCourseById(courseId);
+	public ResponseEntity<?> getCourseById(@PathVariable("courseId") String courseId) {
+		CourseDto courseDto = courseService.getCourseById(courseId);
+
+		CourseResponseModel courseResponse = modelMapper.map(courseDto, CourseResponseModel.class);
+		courseResponse.setNumberOfStudentEnrolled(courseDto.getStudentEnrolled().size());
 		
-		CourseDto dto = entityToDto(course);
-		
-		addSelfLinksToCourses(List.of(dto));
+		addSelfLinksToCourses(List.of(courseResponse));
 
-		return ResponseEntity.ok(dto);
+		return ResponseEntity.ok(courseResponse);
 	}
-
-	private CourseDto entityToDto(Course course) {
-		CourseDto dto = modelMapper.map(course, CourseDto.class);
-
-		return dto;
-	}
-
-	@SuppressWarnings("unused")
-	private Course dtoToEntity(CourseDto dto) {
-		Course course = modelMapper.map(dto, Course.class);
-
-		return course;
-	}
-
-	private List<CourseDto> listEntityToListDto(List<Course> allCourses) {
-		List<CourseDto> dtoList = new ArrayList<>();
-
-		allCourses.forEach(course -> {
-			dtoList.add(modelMapper.map(course, CourseDto.class));
-		});
-
-		return dtoList;
-	}
-
 }

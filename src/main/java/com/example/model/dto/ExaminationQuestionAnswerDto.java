@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import com.example.model.Examination;
+import com.example.model.entity.Examination;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;

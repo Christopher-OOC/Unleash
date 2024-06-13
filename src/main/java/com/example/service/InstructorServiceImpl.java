@@ -5,8 +5,8 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.example.exceptions.NoCourseAvailableException;
-import com.example.model.Course;
-import com.example.model.Instructor;
+import com.example.model.entity.Course;
+import com.example.model.entity.Instructor;
 import com.example.repository.CourseRepository;
 import com.example.repository.InstructorRepository;
 
@@ -32,7 +32,7 @@ public class InstructorServiceImpl implements InstructorService {
 	@Override
 	public List<Course> getAllInstructorCourses(int instructorId) {
 		
-		List<Course> courses = courseRepository.getCoursesFromInstructor(instructorId);
+		List<Course> courses = null;//courseRepository.getCoursesFromInstructor(instructorId);
 		
 		if (courses.isEmpty()) {
 			throw new NoCourseAvailableException("No course created");

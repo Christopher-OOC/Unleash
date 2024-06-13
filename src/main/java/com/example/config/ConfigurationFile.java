@@ -6,10 +6,11 @@ import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.example.model.Course;
-import com.example.model.Examination;
 import com.example.model.dto.CourseDto;
 import com.example.model.dto.ExaminationDto;
+import com.example.model.entity.Course;
+import com.example.model.entity.Examination;
+import com.example.model.responsemodel.CourseResponseModel;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -22,12 +23,6 @@ public class ConfigurationFile {
 		ModelMapper modelMapper = new ModelMapper();
 		
 		modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-		
-		TypeMap<Course, CourseDto> typeMap1 = modelMapper.typeMap(Course.class, CourseDto.class);
-		typeMap1.addMapping(src -> src.getInstructor().getInstructorId(), CourseDto::setInstructorId);
-		
-		TypeMap<CourseDto, Course> typeMap2 = modelMapper.typeMap(CourseDto.class, Course.class);
-		typeMap2.addMapping(src -> src.getInstructorId(), Course::getInstanceWithId);
 		
 		TypeMap<Examination, ExaminationDto> typeMap3 = modelMapper.typeMap(Examination.class, ExaminationDto.class);
 		typeMap3.addMapping(src -> src.getExaminationId().getSessionId().getExaminationSessionId(), ExaminationDto::setSessionId);

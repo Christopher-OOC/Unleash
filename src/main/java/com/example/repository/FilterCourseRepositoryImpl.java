@@ -9,7 +9,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
-import com.example.model.Course;
+import com.example.model.entity.Course;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
