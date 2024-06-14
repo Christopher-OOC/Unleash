@@ -1,6 +1,5 @@
 package com.example.controller;
 
-import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.exceptions.BadRequestException;
 import com.example.model.dto.CourseDto;
 import com.example.model.dto.StudentDto;
-import com.example.model.entity.Course;
 import com.example.model.requestmodel.StudentRequestModel;
 import com.example.model.responsemodel.RequestStatusType;
 import com.example.model.responsemodel.ResponseMessageModel;
@@ -48,8 +46,10 @@ public class StudentApiController {
 
 	private ModelMapper modelMapper;
 
-	private Map<String, String> propertyMap = Map.of("first_name", "firstName", "last_name", "lastName", "middle_name",
+	private Map<String, String> propertyStudent = Map.of("first_name", "firstName", "last_name", "lastName", "middle_name",
 			"middleName");
+
+	private Map<String, String> propertyCourse = Map.of("course_name", "courseName", "course_code", "courseCode");
 
 	public StudentApiController(StudentService studentService, ModelMapper modelMapper) {
 		super();
@@ -97,51 +97,66 @@ public class StudentApiController {
 			@RequestParam(value = "sort", required = false, defaultValue = "last_name,first_name,middle_name") String sortOptions,
 			@RequestParam(value = "search", required = false, defaultValue = "") String search) {
 
-		String[] arrSortFields = sortOptions.split(",");
-
-		for (String sortField : arrSortFields) {
-			String actualField = sortField.replace("-", "");
-
-			if (!propertyMap.keySet().contains(actualField)) {
-				throw new BadRequestException("Invalid sort field: " + actualField);
-			}
-		}
+		validateSortFields(sortOptions, propertyStudent);
 
 		Page<StudentDto> studentPage = studentService.getAllStudents(pageNum - 1, pageSize, sortOptions, search);
 
 		List<StudentDto> listDto = studentPage.getContent();
-		
+
 		log.info("List Student: {}", listDto);
-		
-		java.lang.reflect.Type typeToken = new TypeToken<List<StudentResponseModel>>() {}.getType();
+
+		java.lang.reflect.Type typeToken = new TypeToken<List<StudentResponseModel>>() {
+		}.getType();
 		List<StudentResponseModel> listResponse = modelMapper.map(listDto, typeToken);
 
 		addSelfLinks(listResponse);
-		
+
 		long totalElements = studentPage.getTotalElements();
 		long totalPages = studentPage.getTotalPages();
-		
+
 		PageMetadata metadata = new PageMetadata(pageSize, pageNum, totalElements, totalPages);
-		
+
 		PagedModel<StudentResponseModel> pagedModel = PagedModel.of(listResponse, metadata);
-		
+
 		return ResponseEntity.ok(pagedModel);
 	}
 
 	@PostMapping("/{studentId}/courses/{courseId}")
 	public ResponseEntity<?> enrollForACourse(@PathVariable("studentId") String studentId,
 			@PathVariable("courseId") String courseId) {
-		Course enrolledCourse = studentService.enrollForACourse(studentId, courseId);
 
-		URI uri = URI.create("/v1/students/" + studentId + "/courses/" + courseId);
+		studentService.enrollForACourse(studentId, courseId);
 
-		return ResponseEntity.created(uri).body(modelMapper.map(enrolledCourse, CourseDto.class));
+		ResponseMessageModel message = new ResponseMessageModel();
+		message.setResponseStatusType(ResponseStatusType.SUCCESS);
+		message.setRequestStatusType(RequestStatusType.CREATED);
+
+		return ResponseEntity.ok(message);
 	}
 
 	@GetMapping("/{studentId}/courses")
-	public ResponseEntity<?> getAllCourseEnrolledByStudent(@PathVariable("studentId") String studentId) {
-		List<CourseDto> allEnrolledCourses = studentService.getEnrolledCoursesForAStudent(studentId);
+	public ResponseEntity<?> getAllCourseEnrolledByStudent(@PathVariable("studentId") String studentId,
+			@RequestParam(value = "page", required = false, defaultValue = "1") @Min(value = 1, message = "Page number must not be less than 1") int pageNum,
+			@RequestParam(value = "size", required = false, defaultValue = "3") @Min(value = 1, message = "Page size must not be less than 1") @Max(value = 10, message = "Page size must not be greather than 10") int pageSize,
+			@RequestParam(value = "sort", required = false, defaultValue = "course_name") String sortOptions,
+			@RequestParam(value = "search", required = false, defaultValue = "") String search) {
+
+		validateSortFields(sortOptions, propertyCourse);
+		
+		List<CourseDto> allEnrolledCourses = studentService.getEnrolledCoursesForAStudent(studentId, pageNum, pageSize, sortOptions, search);
 
 		return ResponseEntity.ok(allEnrolledCourses);
+	}
+	
+	private void validateSortFields(String sortOptions, Map<String, String> propertyMap) {
+		String[] arrSortFields = sortOptions.split(",");
+		
+		for (String sortField : arrSortFields) {
+			String actualField = sortField.replace("-", "");
+			
+			if (!propertyMap.keySet().contains(actualField)) {
+				throw new BadRequestException("Invalid sort field: " + actualField);
+			}
+		}
 	}
 }

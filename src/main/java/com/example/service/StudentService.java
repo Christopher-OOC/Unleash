@@ -16,8 +16,8 @@ public interface StudentService {
 	
 	Page<StudentDto> getAllStudents(int pageNum, int pageSize, String sortOptions, String search);
 	
-	Course enrollForACourse(String studentId, String courseId);
+	void enrollForACourse(String studentId, String courseId);
 	
-	List<CourseDto> getEnrolledCoursesForAStudent(String studentId);
+	List<CourseDto> getEnrolledCoursesForAStudent(String studentId, int pageNum, int pageSize, String sortOptions, String search);
 
 }

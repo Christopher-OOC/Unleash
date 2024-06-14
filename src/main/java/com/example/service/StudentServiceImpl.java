@@ -65,19 +65,34 @@ public class StudentServiceImpl implements StudentService {
 		return modelMapper.map(optional.get(), StudentDto.class);
 	}
 
-	private Course checkIfCourseExist(String courseId) {
+	private CourseDto checkIfCourseExist(String courseId) {
 		Optional<Course> optional = courseRepository.findByCourseId(courseId);
 
 		if (optional.isEmpty()) {
 			throw new NoSuchCourseFoundException("" + courseId);
 		}
 
-		return optional.get();
+		return modelMapper.map(optional.get(), CourseDto.class);
 	}
 
 	@Override
 	public Page<StudentDto> getAllStudents(int pageNum, int pageSize, String sortOptions, String search) {
 
+		Sort sort = prepareSortByFields(sortOptions);
+
+		Pageable pageable = PageRequest.of(pageNum, pageSize, sort);
+
+		Page<Student> studentPage = studentRepository.getAllStudentsByPageAndSearch(pageable, search);
+
+		java.lang.reflect.Type typeToken = new TypeToken<List<StudentDto>>() {
+		}.getType();
+
+		List<StudentDto> listDto = modelMapper.map(studentPage.getContent(), typeToken);
+
+		return new PageImpl<>(listDto, pageable, studentPage.getTotalElements());
+	}
+
+	private Sort prepareSortByFields(String sortOptions) {
 		Sort sort = Sort.unsorted();
 
 		String[] sortFields = sortOptions.split(",");
@@ -92,40 +107,39 @@ public class StudentServiceImpl implements StudentService {
 			}
 		}
 
-		Pageable pageable = PageRequest.of(pageNum, pageSize, sort);
-
-		Page<Student> studentPage = studentRepository.getAllStudentsByPageAndSearch(pageable, search);
-
-		java.lang.reflect.Type typeToken = new TypeToken<List<StudentDto>>() {
-		}.getType();
-
-		List<StudentDto> listDto = modelMapper.map(studentPage.getContent(), typeToken);
-
-		return new PageImpl<>(listDto, pageable, studentPage.getTotalElements());
+		return sort;
 	}
 
 	@Override
-	public Course enrollForACourse(String studentId, String courseId) {
-		StudentDto dto = checkIfStudentExist(studentId);
+	public void enrollForACourse(String studentId, String courseId) {
+		StudentDto studentDto = checkIfStudentExist(studentId);
 
-		Course course = checkIfCourseExist(courseId);
+		Student student = modelMapper.map(studentDto, Student.class);
 
-		Student student = modelMapper.map(dto, Student.class);
+		CourseDto courseDto = checkIfCourseExist(courseId);
+
+		Course course = modelMapper.map(courseDto, Course.class);
 
 		student.getCoursesTaken().add(course);
 
 		studentRepository.save(student);
 
-		return course;
 	}
 
 	@Override
-	public List<CourseDto> getEnrolledCoursesForAStudent(String studentId) {
+	public List<CourseDto> getEnrolledCoursesForAStudent(String studentId, int pageNum, int pageSize,
+			String sortOptions, String search) {
 		StudentDto dto = checkIfStudentExist(studentId);
 
 		if (dto.getCoursesTaken().isEmpty()) {
 			throw new NoCourseAvailableException("You don't have any enrolled course");
 		}
+		
+		Sort sort = prepareSortByFields(sortOptions);
+		
+		Pageable pageable = PageRequest.of(pageNum, pageSize, sort);
+		
+		Page<Course> coursePage = null;
 
 		return dto.getCoursesTaken();
 	}
