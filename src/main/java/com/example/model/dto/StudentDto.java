@@ -46,5 +46,12 @@ public class StudentDto {
 	public int hashCode() {
 		return Objects.hash(studentId);
 	}
+
+	@Override
+	public String toString() {
+		return "StudentDto [id=" + id + ", studentId=" + studentId + ", firstName=" + firstName + ", lastName="
+				+ lastName + ", middleName=" + middleName + ", email=" + email + ", password=" + password
+				+ ", dateOfBirth=" + dateOfBirth + "]";
+	}
 	
 }

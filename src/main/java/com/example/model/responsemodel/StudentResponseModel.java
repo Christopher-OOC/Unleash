@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.Objects;
 
 import org.springframework.hateoas.RepresentationModel;
+import org.springframework.hateoas.server.core.Relation;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -12,6 +13,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
+@Relation(collectionRelation="students")
 public class StudentResponseModel extends RepresentationModel<StudentResponseModel> {
 	
 	private String studentId;

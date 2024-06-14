@@ -2,10 +2,11 @@ package com.example.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+
 import com.example.model.dto.CourseDto;
 import com.example.model.dto.StudentDto;
 import com.example.model.entity.Course;
-import com.example.model.entity.Student;
 
 public interface StudentService {
 	
@@ -13,7 +14,7 @@ public interface StudentService {
 	
 	StudentDto getByStudentId(String studentId);
 	
-	List<Student> getAllStudents();
+	Page<StudentDto> getAllStudents(int pageNum, int pageSize, String sortOptions, String search);
 	
 	Course enrollForACourse(String studentId, String courseId);
 	
