@@ -13,7 +13,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CourseDto {
 	
-	private int courseId;
+	private int id;
+	
+	private String courseId;
 	
 	private String courseCode;
 	
@@ -31,25 +33,22 @@ public class CourseDto {
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (!super.equals(obj))
+		if (obj == null)
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
 		CourseDto other = (CourseDto) obj;
-		return courseId == other.courseId;
+		return id == other.id;
 	}
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + Objects.hash(courseId);
-		return result;
+		return Objects.hash(id);
 	}
 
 	@Override
 	public String toString() {
-		return "CourseDto [courseId=" + courseId + ", courseCode=" + courseCode + ", courseName=" + courseName
-				+ ", dateCreated=" + dateCreated + "]";
-	}	
+		return "CourseDto [id=" + id + ", courseId=" + courseId + ", courseCode=" + courseCode + ", courseName="
+				+ courseName + ", dateCreated=" + dateCreated + "]";
+	}
 }

@@ -9,7 +9,7 @@ import com.example.model.entity.Course;
 
 public interface CourseService {
 	
-	Course addNewCourse(Course course, int instructorId);
+	Course addNewCourse(String instructorId, CourseDto courseDto);
 	
 	CourseDto getCourseById(String courseId);
 	

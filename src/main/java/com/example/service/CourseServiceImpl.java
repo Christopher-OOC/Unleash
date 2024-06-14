@@ -13,7 +13,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import com.example.exceptions.NoCourseAvailableException;
 import com.example.exceptions.NoSuchCourseFoundException;
 import com.example.exceptions.NoSuchInstructorException;
 import com.example.model.dto.CourseDto;
@@ -42,17 +41,19 @@ public class CourseServiceImpl implements CourseService {
 	}
 	
 	@Override
-	public Course addNewCourse(Course course, int instructorId) {
+	public Course addNewCourse(String instructorId, CourseDto courseDto) {
 		
 		Instructor instructor = checkIfInstructorExists(instructorId);
+		
+		Course course = modelMapper.map(courseDto, Course.class);
 		
 		course.setInstructor(instructor);
 		
 		return courseRepository.save(course);
 	}
 
-	private Instructor checkIfInstructorExists(int instructorId) {
-		Optional<Instructor> optional = instructorRepository.findById(instructorId);
+	private Instructor checkIfInstructorExists(String instructorId) {
+		Optional<Instructor> optional = instructorRepository.findByInstructorId(instructorId);
 		
 		if (optional.isEmpty()) {
 			throw new NoSuchInstructorException(instructorId);

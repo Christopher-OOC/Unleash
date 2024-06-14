@@ -15,13 +15,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CourseRequestModel {
 	
-	@JsonProperty("course_code")
 	@NotNull(message="Course code cannot be null")
 	@NotBlank(message="Course code cannot be empty")
 	@Length(min=4, max=10, message="Course code must have between 4-10 characters")
 	private String courseCode;
 	
-	@JsonProperty("course_name")
 	@NotNull(message="Course name cannot be null")
 	@NotBlank(message="Course namee cannot be empty")
 	@Length(max=100, message="Course name must have 100 characters or less")

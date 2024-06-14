@@ -3,25 +3,37 @@ package com.example.controller;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.PagedModel;
+import org.springframework.hateoas.PagedModel.PageMetadata;
 import org.springframework.http.ResponseEntity;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.exceptions.BadRequestException;
 import com.example.exceptions.PasswordNotTheSameException;
 import com.example.model.dto.CourseDto;
 import com.example.model.dto.ExaminationSessionDto;
 import com.example.model.dto.InstructorDto;
-import com.example.model.entity.Course;
 import com.example.model.entity.ExaminationSession;
-import com.example.model.entity.Instructor;
+import com.example.model.requestmodel.CourseRequestModel;
 import com.example.model.requestmodel.InstructorRequestModel;
+import com.example.model.responsemodel.CourseResponseModel;
+import com.example.model.responsemodel.RequestStatusType;
+import com.example.model.responsemodel.ResponseMessageModel;
+import com.example.model.responsemodel.ResponseStatusType;
 import com.example.service.CourseService;
 import com.example.service.ExaminationSessionService;
 import com.example.service.InstructorService;
@@ -43,6 +55,9 @@ public class InstructorApiController {
 
 	private ModelMapper modelMapper;
 
+	private Map<String, Object> propertyMap = Map.of("course_code", "courseCode", "course_name", "courseName",
+			"date_created", "dateCreated");
+
 	public InstructorApiController(InstructorService instructorService, ModelMapper modelMapper,
 			CourseService courseService, ExaminationSessionService examinationSessionService) {
 		super();
@@ -55,46 +70,88 @@ public class InstructorApiController {
 	@PostMapping
 	public ResponseEntity<?> registerAsAnInstructor(@RequestBody @Valid InstructorRequestModel requestModel) {
 		// Check if password and confirmPassword are the same
-		
+
 		if (!requestModel.getPassword().equals(requestModel.getConfirmPassword())) {
 			throw new PasswordNotTheSameException();
 		}
-		
-		InstructorDto dto = modelMapper.map(requestModel, InstructorDto.class);
-		
-		//Generate instructorId
-		dto.setInstructorId(PublicIdGeneratorUtils.generateId(30));
 
-//		Instructor savedInstructor = instructorService.save(instructor);
-//
-//		InstructorDto dto = instructorEntityToDto(savedInstructor);
-//
-//		URI uri = URI.create("/v1/instructors/" + dto.getInstructorId());
+		InstructorDto instructorDto = modelMapper.map(requestModel, InstructorDto.class);
 
-		return null;//ResponseEntity.created(uri).body(dto);
+		// Generate instructorId
+		instructorDto.setInstructorId(PublicIdGeneratorUtils.generateId(30));
+
+		instructorService.save(instructorDto);
+
+		URI uri = URI.create("/v1/instructors/" + instructorDto.getInstructorId());
+
+		ResponseMessageModel message = new ResponseMessageModel();
+		message.setResponseStatusType(ResponseStatusType.SUCCESS);
+		message.setRequestStatusType(RequestStatusType.CREATED);
+
+		return ResponseEntity.created(uri).body(message);
 	}
 
 	@PostMapping("/{instructorId}/courses")
-	public ResponseEntity<?> addACourse(@RequestBody @Valid CourseDto courseDto,
-			@PathVariable("instructorId") @Positive(message = "The instructor ID must be positive") int instructorId) {
+	public ResponseEntity<?> addACourse(@RequestBody @Valid CourseRequestModel courseModel,
+			@PathVariable("instructorId") String instructorId) {
 
-		Course savedCourse = courseService.addNewCourse(dtoToEntity(courseDto), instructorId);
+		CourseDto courseDto = modelMapper.map(courseModel, CourseDto.class);
+		courseDto.setCourseId(PublicIdGeneratorUtils.generateId(30));
 
-		CourseDto dto = entityToDto(savedCourse);
+		courseService.addNewCourse(instructorId, courseDto);
 
-		URI uri = URI.create("/v1/courses/" + dto.getCourseId());
+		URI uri = URI.create("/v1/courses/" + courseDto.getCourseId());
 
-		return ResponseEntity.created(uri).body(dto);
+		ResponseMessageModel message = new ResponseMessageModel();
+		message.setResponseStatusType(ResponseStatusType.SUCCESS);
+		message.setRequestStatusType(RequestStatusType.CREATED);
+
+		return ResponseEntity.created(uri).body(message);
 	}
 
 	@GetMapping("/{instructorId}/courses")
-	public ResponseEntity<?> getAllCoursesByInstructor(
-			@PathVariable("instructorId") @Positive(message = "Instuctor ID must be positive") int instructorId) {
-		List<Course> courseList = instructorService.getAllInstructorCourses(instructorId);
+	public ResponseEntity<?> getAllCoursesByInstructor(@PathVariable("instructorId") String instructorId,
+			@RequestParam(value = "page", required = false, defaultValue = "1") @Positive(message = "Page number must be positive") int page,
+			@RequestParam(value = "size", required = false, defaultValue = "3") @Positive(message = "Page size must be positive") int size,
+			@RequestParam(value = "sort", required = false, defaultValue = "date_created") String sortFields) {
 
-		List<CourseDto> dtos = listEntityToListDto(courseList);
+		// Validate Sort Fields
+		String[] arrSortFields = sortFields.split(",");
 
-		return ResponseEntity.ok(dtos);
+		for (String field : arrSortFields) {
+			String actualField = field.replace("-", "");
+			if (!propertyMap.keySet().contains(actualField)) {
+				throw new BadRequestException("Invalid sort field: " + actualField);
+			}
+		}
+
+		Page<CourseDto> pageDto = instructorService.getAllInstructorCourses(instructorId, page, size, sortFields);
+
+		List<CourseDto> listDto = pageDto.getContent();
+
+		List<CourseResponseModel> listResponse = new ArrayList<>();
+
+		for (CourseDto dto : listDto) {
+			CourseResponseModel response = modelMapper.map(dto, CourseResponseModel.class);
+			response.setNumberOfStudentEnrolled(dto.getStudentEnrolled().size());
+			listResponse.add(response);
+		}
+
+		addSelfLinksToEachResponse(listResponse);
+
+		PageMetadata pageMetadata = new PageMetadata(size, page, pageDto.getTotalElements(), pageDto.getTotalPages());
+
+		CollectionModel<CourseResponseModel> collectionModel = PagedModel.of(listResponse, pageMetadata);
+		
+		return ResponseEntity.ok(collectionModel);
+	}
+
+	private void addSelfLinksToEachResponse(List<CourseResponseModel> listResponse) {
+		listResponse.forEach(response -> {
+			response.add(
+					linkTo(methodOn(CourseApiController.class).getCourseById(response.getCourseId())).withSelfRel());
+		});
+
 	}
 
 	@PostMapping("/exam-session/{courseId}")
@@ -106,36 +163,6 @@ public class InstructorApiController {
 		URI uri = URI.create("/v1/courses/" + courseId + "/" + savedExamSession.getExaminationSessionId());
 
 		return ResponseEntity.created(uri).body(modelMapper.map(savedExamSession, ExaminationSessionDto.class));
-	}
-
-	private Instructor instructorDtoToEntity(InstructorDto dto) {
-		return modelMapper.map(dto, Instructor.class);
-	}
-
-	private InstructorDto instructorEntityToDto(Instructor instructor) {
-		return modelMapper.map(instructor, InstructorDto.class);
-	}
-
-	private CourseDto entityToDto(Course course) {
-		CourseDto dto = modelMapper.map(course, CourseDto.class);
-
-		return dto;
-	}
-
-	private Course dtoToEntity(CourseDto dto) {
-		Course course = modelMapper.map(dto, Course.class);
-
-		return course;
-	}
-
-	private List<CourseDto> listEntityToListDto(List<Course> allCourses) {
-		List<CourseDto> dtoList = new ArrayList<>();
-
-		allCourses.forEach(course -> {
-			dtoList.add(modelMapper.map(course, CourseDto.class));
-		});
-
-		return dtoList;
 	}
 
 }

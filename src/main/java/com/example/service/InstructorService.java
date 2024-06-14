@@ -2,14 +2,16 @@ package com.example.service;
 
 import java.util.List;
 
-import com.example.model.entity.Course;
-import com.example.model.entity.Instructor;
+import org.springframework.data.domain.Page;
+
+import com.example.model.dto.CourseDto;
+import com.example.model.dto.InstructorDto;
 
 public interface InstructorService {
 	
-	List<Course> getAllInstructorCourses(int instructorId);
+	Page<CourseDto> getAllInstructorCourses(String instructorId, int page, int size, String sortFields);
 
-	Instructor save(Instructor instructor);
+	void save(InstructorDto instructorDto);
 	
 	
 

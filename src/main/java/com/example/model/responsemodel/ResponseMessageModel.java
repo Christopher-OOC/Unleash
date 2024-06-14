@@ -1,10 +1,13 @@
 package com.example.model.responsemodel;
 
-import java.util.Date;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@NoArgsConstructor
 public class ResponseMessageModel {
 
-	private ResponseStatusType status;
+	private ResponseStatusType responseStatusType;
 	
-	private Date date = new Date();
+	private RequestStatusType RequestStatusType;
 }

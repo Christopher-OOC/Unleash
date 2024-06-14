@@ -7,7 +7,6 @@ import org.springframework.hateoas.RepresentationModel;
 import org.springframework.hateoas.server.core.Relation;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import lombok.Data;
@@ -19,23 +18,17 @@ import lombok.NoArgsConstructor;
 @Relation(collectionRelation="courses")
 public class CourseResponseModel extends RepresentationModel<CourseResponseModel> {
 	
-	@JsonProperty("course_id")
 	private String courseId;
 	
-	@JsonProperty("course_code")
 	private String courseCode;
 	
-	@JsonProperty("course_name")
 	private String courseName;
 	
-	@JsonProperty("number_of_student_enrolled")
 	private int numberOfStudentEnrolled;
 	
-	@JsonProperty("date_created")
 	@JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd")
 	private Date dateCreated;
 	
-	@JsonProperty("instructor")
 	private InstructorResponseModel instructor;
 
 	@Override

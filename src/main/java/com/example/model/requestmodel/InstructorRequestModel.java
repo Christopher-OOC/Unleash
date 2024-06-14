@@ -3,7 +3,6 @@ import java.util.Objects;
 
 import org.hibernate.validator.constraints.Length;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import jakarta.validation.constraints.Email;
@@ -19,8 +18,7 @@ public class InstructorRequestModel {
 	
 	@NotNull(message="Full name cannot be null")
 	@NotBlank(message="Full name cannot be empty")
-	@Length(min=5, max=50, message="Last name must have between 5-50 characters")
-	@JsonProperty("full_name")
+	@Length(min=5, max=50, message="Full name must have between 5-50 characters")
 	private String fullName;
 	
 	@NotNull(message="Email cannot be null")

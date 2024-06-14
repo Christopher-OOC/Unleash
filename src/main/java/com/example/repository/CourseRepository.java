@@ -11,8 +11,5 @@ import com.example.model.entity.Course;
 public interface CourseRepository extends JpaRepository<Course, Integer>, FilterCourseRepository {
 	
 	Optional<Course> findByCourseId(String courseId);
-	
-	@Query("SELECT c FROM Course c WHERE c.instructor.instructorId = ?1")
-	List<Course> getCoursesFromInstructor(String intructorId);
 
 }
