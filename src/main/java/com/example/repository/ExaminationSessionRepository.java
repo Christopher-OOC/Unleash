@@ -8,7 +8,7 @@ import com.example.model.entity.ExaminationSession;
 public interface ExaminationSessionRepository extends JpaRepository<ExaminationSession, Integer> {
 	
 	@Query("SELECT e FROM ExaminationSession e WHERE e.course.courseId = ?1 AND e.sessionClosed = false")
-	ExaminationSession findCurrentExaminationSession(int courseId);
+	ExaminationSession findCurrentExaminationSession(String courseId);
 	
 	@Query("SELECT e FROM ExaminationSession e WHERE e.examinationSessionId = ?1")
 	ExaminationSession findAnyExaminationSession(int sessionId);

@@ -28,10 +28,10 @@ public class ConfigurationFile {
 		typeMap3.addMapping(src -> src.getExaminationId().getSessionId().getExaminationSessionId(), ExaminationDto::setSessionId);
 		typeMap3.addMapping(src -> src.getExaminationId().getStudentId().getStudentId(), ExaminationDto::setStudentId);
 		
-		TypeMap<ExaminationDto, Examination> typeMap4 = modelMapper.typeMap(ExaminationDto.class, Examination.class);
-		typeMap4.addMapping(src -> src.getSessionId(), (dest, value) -> dest.getExaminationId().getSessionId().setExaminationSessionId(value != null ? (int) value : -1));
-		typeMap4.addMapping(src -> src.getStudentId(), (dest, value) -> dest.getExaminationId().getStudentId().setStudentId(value != null ? (int) value : -1));
-		
+//		TypeMap<ExaminationDto, Examination> typeMap4 = modelMapper.typeMap(ExaminationDto.class, Examination.class);
+//		typeMap4.addMapping(src -> src.getSessionId(), (dest, value) -> dest.getExaminationId().getSessionId().setExaminationSessionId(value != null ? (int) value : -1));
+//		typeMap4.addMapping(src -> src.getStudentId(), (dest, value) -> dest.getExaminationId().getStudentId().setStudentId(value != null ? (int) value : -1));
+//		
 		return modelMapper;
 	}
 	

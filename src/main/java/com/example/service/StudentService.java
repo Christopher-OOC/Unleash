@@ -2,19 +2,21 @@ package com.example.service;
 
 import java.util.List;
 
+import com.example.model.dto.CourseDto;
+import com.example.model.dto.StudentDto;
 import com.example.model.entity.Course;
 import com.example.model.entity.Student;
 
 public interface StudentService {
 	
-	Student register(Student student);
+	void register(StudentDto studentDto);
 	
-	Student getById(int studentId);
+	StudentDto getByStudentId(String studentId);
 	
 	List<Student> getAllStudents();
 	
-	Course enrollForACourse(int studentId, int courseId);
+	Course enrollForACourse(String studentId, String courseId);
 	
-	List<Course> getEnrolledCoursesForAStudent(int studentId);
+	List<CourseDto> getEnrolledCoursesForAStudent(String studentId);
 
 }

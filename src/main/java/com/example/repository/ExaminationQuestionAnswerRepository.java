@@ -17,5 +17,5 @@ public interface ExaminationQuestionAnswerRepository extends JpaRepository<Exami
 			ORDER BY RAND()
 			LIMIT 1
 			""")
-	ExaminationQuestionAnswer findExaminationNextQuestion(int sessionId, int studentId);
+	ExaminationQuestionAnswer findExaminationNextQuestion(int sessionId, String studentId);
 }

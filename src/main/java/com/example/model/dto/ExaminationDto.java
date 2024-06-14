@@ -24,7 +24,7 @@ public class ExaminationDto extends RepresentationModel<ExaminationDto> {
 	private int sessionId;
 	
 	@JsonProperty("student_id")
-	private int studentId;
+	private String studentId;
 	
 	@JsonProperty("examination_questions")
 	private ExaminationQuestionAnswerDto nextQuestion;

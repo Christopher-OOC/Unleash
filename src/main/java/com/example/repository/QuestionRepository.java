@@ -16,6 +16,6 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
 			SELECT q FROM Question q WHERE q.course.courseId = ?1
 			ORDER BY RAND() LIMIT ?2
 			""")
-	List<Question> getExaminationQuestions(int courseId, int numberOfExaminationQuestions);
+	List<Question> getExaminationQuestions(String courseId, int numberOfExaminationQuestions);
 
 }

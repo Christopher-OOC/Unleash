@@ -7,11 +7,11 @@ import com.example.model.entity.Examination;
 
 public interface ExaminationService {
 	
-	ExaminationDto startExamination(int courseId, int studentId);
+	ExaminationDto startExamination(String courseId, String studentId);
 	
-	Examination endExamination(int courseId, int studentId);
+	Examination endExamination(String courseId, String studentId);
 	
-	ExaminationResultDto checkResult(int sessionId, int studentId);
+	ExaminationResultDto checkResult(int sessionId, String studentId);
 	
 	ExaminationDto submitPrevoiusAndGetNextQuestion(ExaminationDto examDto);
 	

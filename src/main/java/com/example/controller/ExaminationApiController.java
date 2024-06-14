@@ -30,16 +30,16 @@ public class ExaminationApiController {
 	}
 
 	@GetMapping
-	public ResponseEntity<?> startExamination(@RequestParam("courseId") int courseId,
-			@RequestParam("studentId") int studentId) {
+	public ResponseEntity<?> startExamination(@RequestParam("courseId") String courseId,
+			@RequestParam("studentId") String studentId) {
 		ExaminationDto examinationDto = examinationService.startExamination(courseId, studentId);
 
 		return ResponseEntity.ok(examinationDto);
 	}
 
 	@PostMapping
-	public ResponseEntity<?> endExamination(@RequestParam("courseId") int courseId,
-			@RequestParam("studentId") int studentId) {
+	public ResponseEntity<?> endExamination(@RequestParam("courseId")String courseId,
+			@RequestParam("studentId") String studentId) {
 		Examination examination = examinationService.endExamination(courseId, studentId);
 
 		return ResponseEntity.ok(entityToDto(examination));
@@ -54,7 +54,7 @@ public class ExaminationApiController {
 
 	@GetMapping("/results")
 	public ResponseEntity<?> checkResult(@RequestParam("sessionId") int sessionId,
-			@RequestParam("studentId") int studentId) {
+			@RequestParam("studentId") String studentId) {
 		ExaminationResultDto resultDto = examinationService.checkResult(sessionId, studentId);
 
 		return ResponseEntity.ok(resultDto);

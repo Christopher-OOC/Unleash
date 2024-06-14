@@ -1,18 +1,18 @@
-package com.example.model.dto;
+package com.example.model.responsemodel;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Objects;
+
+import org.springframework.hateoas.RepresentationModel;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class StudentDto {
-	
-	private int id;
+public class StudentResponseModel extends RepresentationModel<StudentResponseModel> {
 	
 	private String studentId;
 	
@@ -24,11 +24,8 @@ public class StudentDto {
 	
 	private String email;
 	
-	private String password;
-	
+	@JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd")
 	private Date dateOfBirth;
-	
-	private List<CourseDto> coursesTaken = new ArrayList<>();
 
 	@Override
 	public boolean equals(Object obj) {
@@ -38,7 +35,7 @@ public class StudentDto {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		StudentDto other = (StudentDto) obj;
+		StudentResponseModel other = (StudentResponseModel) obj;
 		return studentId == other.studentId;
 	}
 
@@ -46,5 +43,6 @@ public class StudentDto {
 	public int hashCode() {
 		return Objects.hash(studentId);
 	}
+	
 	
 }

@@ -27,8 +27,8 @@ import com.example.exceptions.PasswordNotTheSameException;
 import com.example.model.dto.CourseDto;
 import com.example.model.dto.ExaminationSessionDto;
 import com.example.model.dto.InstructorDto;
-import com.example.model.entity.ExaminationSession;
 import com.example.model.requestmodel.CourseRequestModel;
+import com.example.model.requestmodel.ExaminationSessionRequestModel;
 import com.example.model.requestmodel.InstructorRequestModel;
 import com.example.model.responsemodel.CourseResponseModel;
 import com.example.model.responsemodel.RequestStatusType;
@@ -142,7 +142,7 @@ public class InstructorApiController {
 		PageMetadata pageMetadata = new PageMetadata(size, page, pageDto.getTotalElements(), pageDto.getTotalPages());
 
 		CollectionModel<CourseResponseModel> collectionModel = PagedModel.of(listResponse, pageMetadata);
-		
+
 		return ResponseEntity.ok(collectionModel);
 	}
 
@@ -154,15 +154,19 @@ public class InstructorApiController {
 
 	}
 
-	@PostMapping("/exam-session/{courseId}")
-	public ResponseEntity<?> createAnExaminaionSession(@RequestBody @Valid ExaminationSessionDto dto,
-			@PathVariable("courseId") @Valid int courseId) {
+	@PostMapping("/{courseId}/exam-session")
+	public ResponseEntity<?> createAnExaminaionSession(@RequestBody @Valid ExaminationSessionRequestModel requestModel,
+			@PathVariable("courseId") String courseId) {
+		
+		ExaminationSessionDto dto = modelMapper.map(requestModel, ExaminationSessionDto.class);
 
-		ExaminationSession savedExamSession = examinationSessionService.createExamSessionForACourse(dto, courseId);
+		examinationSessionService.createExamSessionForACourse(courseId, dto);
 
-		URI uri = URI.create("/v1/courses/" + courseId + "/" + savedExamSession.getExaminationSessionId());
-
-		return ResponseEntity.created(uri).body(modelMapper.map(savedExamSession, ExaminationSessionDto.class));
+		ResponseMessageModel message = new ResponseMessageModel();
+		message.setResponseStatusType(ResponseStatusType.SUCCESS);
+		message.setRequestStatusType(RequestStatusType.CREATED);
+		
+		return ResponseEntity.created(null).body(message);
 	}
 
 }

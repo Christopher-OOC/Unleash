@@ -14,7 +14,6 @@ import com.example.exceptions.NoSuchCourseFoundException;
 import com.example.exceptions.NoSuchStudentFoundException;
 import com.example.exceptions.NotRegisteredForTheCourseException;
 import com.example.controller.ExaminationApiController;
-import com.example.exceptions.NoExaminationFoundException;
 import com.example.exceptions.NoExaminationSessionException;
 import com.example.exceptions.NoOngoingExaminationException;
 import com.example.model.dto.ExaminationDto;
@@ -74,7 +73,7 @@ public class ExaminationServiceImpl implements ExaminationService {
 	}
 
 	@Override
-	public ExaminationDto startExamination(int courseId, int studentId) {
+	public ExaminationDto startExamination(String courseId, String studentId) {
 		// Get Student
 		Student student = checkIfStudentExist(studentId);
 
@@ -128,7 +127,7 @@ public class ExaminationServiceImpl implements ExaminationService {
 		return examDto;
 	}
 
-	private ExaminationSession checkIfSessionExists(int courseId) {
+	private ExaminationSession checkIfSessionExists(String courseId) {
 		ExaminationSession session = sessionRepository.findCurrentExaminationSession(courseId);
 
 		if (session == null) {
@@ -137,8 +136,8 @@ public class ExaminationServiceImpl implements ExaminationService {
 		return session;
 	}
 
-	private Course checkIfCourseExist(int courseId) {
-		Optional<Course> optionalCourse = courseRepository.findById(courseId);
+	private Course checkIfCourseExist(String courseId) {
+		Optional<Course> optionalCourse = courseRepository.findByCourseId(courseId);
 
 		if (optionalCourse.isEmpty()) {
 			throw new NoSuchCourseFoundException("" + courseId);
@@ -147,8 +146,8 @@ public class ExaminationServiceImpl implements ExaminationService {
 		return optionalCourse.get();
 	}
 
-	private Student checkIfStudentExist(int studentId) {
-		Optional<Student> optionalStudent = studentRepository.findById(studentId);
+	private Student checkIfStudentExist(String studentId) {
+		Optional<Student> optionalStudent = studentRepository.findByStudentId(studentId);
 
 		if (optionalStudent.isEmpty()) {
 			throw new NoSuchStudentFoundException(studentId);
@@ -158,7 +157,7 @@ public class ExaminationServiceImpl implements ExaminationService {
 	}
 
 	@Override
-	public Examination endExamination(int courseId, int studentId) {
+	public Examination endExamination(String courseId, String studentId) {
 		checkIfCourseExist(courseId);
 
 		// Get Current Exam Session
@@ -180,7 +179,7 @@ public class ExaminationServiceImpl implements ExaminationService {
 		return examinationRepository.save(examination);
 	}
 
-	private Examination checkIfExaminationOngoing(int studentId, ExaminationId id) {
+	private Examination checkIfExaminationOngoing(String studentId, ExaminationId id) {
 		Optional<Examination> optionalExamination = examinationRepository.findById(id);
 
 		if (optionalExamination.isEmpty()) {
@@ -192,9 +191,9 @@ public class ExaminationServiceImpl implements ExaminationService {
 	}
 
 	@Override
-	public ExaminationResultDto checkResult(int sessionId, int studentId) {
+	public ExaminationResultDto checkResult(int sessionId, String studentId) {
 		// Get Session
-		ExaminationSession session = checkIfSessionExists(studentId);
+		ExaminationSession session = checkIfSessionExists("" + studentId);
 
 		// Get Student
 		Student student = checkIfStudentExist(studentId);

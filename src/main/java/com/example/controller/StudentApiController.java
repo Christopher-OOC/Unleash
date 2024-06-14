@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,7 +21,13 @@ import com.example.model.dto.CourseDto;
 import com.example.model.dto.StudentDto;
 import com.example.model.entity.Course;
 import com.example.model.entity.Student;
+import com.example.model.requestmodel.StudentRequestModel;
+import com.example.model.responsemodel.RequestStatusType;
+import com.example.model.responsemodel.ResponseMessageModel;
+import com.example.model.responsemodel.ResponseStatusType;
+import com.example.model.responsemodel.StudentResponseModel;
 import com.example.service.StudentService;
+import com.example.utilities.PublicIdGeneratorUtils;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
@@ -39,26 +48,38 @@ public class StudentApiController {
 	}
 
 	@PostMapping
-	public ResponseEntity<?> register(@RequestBody @Valid StudentDto studentDto) {
-		Student student = studentService.register(modelMapper.map(studentDto, Student.class));
+	public ResponseEntity<?> register(@RequestBody @Valid StudentRequestModel requestModel) {
+		StudentDto dto = modelMapper.map(requestModel, StudentDto.class);
+		
+		dto.setStudentId(PublicIdGeneratorUtils.generateId(30));
+		
+		studentService.register(dto);
+		
+		ResponseMessageModel message = new ResponseMessageModel();
+		message.setResponseStatusType(ResponseStatusType.SUCCESS);
+		message.setRequestStatusType(RequestStatusType.CREATED);
 
-		StudentDto savedDto = modelMapper.map(student, StudentDto.class);
-
-		URI uri = URI.create("/v1/students/" + savedDto.getStudentId());
-
-		return ResponseEntity.created(uri).body(savedDto);
+		return ResponseEntity.created(null).body(message);
 	}
 
 	@GetMapping("/{studentId}")
 	public ResponseEntity<?> getStudentById(
-			@PathVariable("studentId") @Positive(message = "studentId must be positive") int studentId) {
-		Student student = studentService.getById(studentId);
+			@PathVariable("studentId") String studentId) {
+		StudentDto dto = studentService.getByStudentId(studentId);
 
-		//StudentDto dto = modelMapper.map(student, StudentDto.class);
-		StudentDto dto = null;//utils.studentEntityToDto(student);
-		return ResponseEntity.ok(dto);
+		StudentResponseModel response = modelMapper.map(dto, StudentResponseModel.class);
+		
+		addSelfLinks(List.of(response));
+		
+		return ResponseEntity.ok(response);
 	}
 
+	private void addSelfLinks(List<StudentResponseModel> listResponse) {
+		listResponse.forEach(response -> {
+			response.add(linkTo(methodOn(getClass()).getStudentById(response.getStudentId())).withSelfRel());
+		});
+	}
+	
 	@GetMapping
 	public ResponseEntity<?> getAllStudent() {
 		List<Student> allStudents = studentService.getAllStudents();
@@ -67,10 +88,11 @@ public class StudentApiController {
 
 		return ResponseEntity.ok(dtos);
 	}
+	
 
 	@PostMapping("/{studentId}/courses/{courseId}")
-	public ResponseEntity<?> enrollForACourse(@PathVariable("studentId") int studentId,
-			@PathVariable("courseId") int courseId) {
+	public ResponseEntity<?> enrollForACourse(@PathVariable("studentId") String studentId,
+			@PathVariable("courseId") String courseId) {
 		Course enrolledCourse = studentService.enrollForACourse(studentId, courseId);
 
 		URI uri = URI.create("/v1/students/" + studentId + "/courses/" + courseId);
@@ -79,12 +101,11 @@ public class StudentApiController {
 	}
 
 	@GetMapping("/{studentId}/courses")
-	public ResponseEntity<?> getAllCourseEnrolledByStudent(@PathVariable("studentId") int studentId) {
-		List<Course> allEnrolledCourses = studentService.getEnrolledCoursesForAStudent(studentId);
+	public ResponseEntity<?> getAllCourseEnrolledByStudent(@PathVariable("studentId") String studentId) {
+		List<CourseDto> allEnrolledCourses = studentService.getEnrolledCoursesForAStudent(studentId);
 
-		List<CourseDto> dtos = listEntityToDtos(allEnrolledCourses);
 
-		return ResponseEntity.ok(dtos);
+		return ResponseEntity.ok(allEnrolledCourses);
 	}
 
 	private List<CourseDto> listEntityToDtos(List<Course> allEnrolledCourses) {

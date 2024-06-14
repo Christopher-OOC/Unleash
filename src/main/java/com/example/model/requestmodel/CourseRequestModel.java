@@ -2,9 +2,8 @@ package com.example.model.requestmodel;
 
 import java.util.Objects;
 
-import org.hibernate.validator.constraints.Length;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.hibernate.validator.constraints.Length;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

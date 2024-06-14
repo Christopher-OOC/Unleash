@@ -28,7 +28,7 @@ public class ExaminationSessionServiceImpl implements ExaminationSessionService 
 	}
 
 	@Override
-	public ExaminationSession createExamSessionForACourse(ExaminationSessionDto dto, int courseId) {
+	public void createExamSessionForACourse(String courseId, ExaminationSessionDto dto) {
 		
 		Course course = checkIfCourseExists(courseId);
 		
@@ -43,7 +43,7 @@ public class ExaminationSessionServiceImpl implements ExaminationSessionService 
 			currentSession.setStartTime(dto.getStartTime());
 			currentSession.setEndTime(dto.getEndTime());
 			
-			return examinationSessionRepository.save(currentSession);
+			examinationSessionRepository.save(currentSession);
 		}
 		else {
 			throw new ExaminationSessionAlreadyCreated(courseId);
@@ -51,8 +51,8 @@ public class ExaminationSessionServiceImpl implements ExaminationSessionService 
 		
 	}
 
-	private Course checkIfCourseExists(int courseId) {
-		Optional<Course> optional = courseRepository.findById(courseId);
+	private Course checkIfCourseExists(String courseId) {
+		Optional<Course> optional = courseRepository.findByCourseId(courseId);
 		
 		if (optional.isEmpty()) {
 			throw new NoSuchCourseFoundException("" + courseId);

@@ -10,6 +10,8 @@ import com.example.exceptions.NoCourseAvailableException;
 import com.example.exceptions.NoStudentAvailableException;
 import com.example.exceptions.NoSuchCourseFoundException;
 import com.example.exceptions.NoSuchStudentFoundException;
+import com.example.model.dto.CourseDto;
+import com.example.model.dto.StudentDto;
 import com.example.model.entity.Course;
 import com.example.model.entity.Student;
 import com.example.repository.CourseRepository;
@@ -21,36 +23,41 @@ public class StudentServiceImpl implements StudentService {
 	private StudentRepository studentRepository;
 
 	private CourseRepository courseRepository;
+	
+	private ModelMapper modelMapper;
 
 	public StudentServiceImpl(StudentRepository studentRepository, CourseRepository courseRepository,
 			ModelMapper modelMapper) {
 		super();
 		this.studentRepository = studentRepository;
 		this.courseRepository = courseRepository;
+		this.modelMapper = modelMapper;
 	}
 
 	@Override
-	public Student register(Student student) {
-		return studentRepository.save(student);
+	public void register(StudentDto dto) {
+		Student student = modelMapper.map(dto, Student.class);
+		
+		studentRepository.save(student);
 	}
 
 	@Override
-	public Student getById(int studentId) {
+	public StudentDto getByStudentId(String studentId) {
 		return checkIfStudentExist(studentId);
 	}
 
-	private Student checkIfStudentExist(int studentId) {
-		Optional<Student> optional = studentRepository.findById(studentId);
+	private StudentDto checkIfStudentExist(String studentId) {
+		Optional<Student> optional = studentRepository.findByStudentId(studentId);
 
 		if (optional.isEmpty()) {
 			throw new NoSuchStudentFoundException(studentId);
 		}
 
-		return optional.get();
+		return modelMapper.map(optional.get(), StudentDto.class);
 	}
 
-	private Course checkIfCourseExist(int courseId) {
-		Optional<Course> optional = courseRepository.findById(courseId);
+	private Course checkIfCourseExist(String courseId) {
+		Optional<Course> optional = courseRepository.findByCourseId(courseId);
 
 		if (optional.isEmpty()) {
 			throw new NoSuchCourseFoundException("" + courseId);
@@ -75,10 +82,12 @@ public class StudentServiceImpl implements StudentService {
 	}
 
 	@Override
-	public Course enrollForACourse(int studentId, int courseId) {
-		Student student = checkIfStudentExist(studentId);
+	public Course enrollForACourse(String studentId, String courseId) {
+		StudentDto dto = checkIfStudentExist(studentId);
 
 		Course course = checkIfCourseExist(courseId);
+		
+		Student student = modelMapper.map(dto, Student.class);
 
 		student.getCoursesTaken().add(course);
 
@@ -88,13 +97,13 @@ public class StudentServiceImpl implements StudentService {
 	}
 
 	@Override
-	public List<Course> getEnrolledCoursesForAStudent(int studentId) {
-		Student student = checkIfStudentExist(studentId);
+	public List<CourseDto> getEnrolledCoursesForAStudent(String studentId) {
+		StudentDto dto = checkIfStudentExist(studentId);
 		
-		if (student.getCoursesTaken().isEmpty()) {
+		if (dto.getCoursesTaken().isEmpty()) {
 			throw new NoCourseAvailableException("You don't have any enrolled course");
 		}
 		
-		return student.getCoursesTaken();
+		return dto.getCoursesTaken();
 	}
 }

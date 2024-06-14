@@ -5,7 +5,7 @@ import com.example.model.entity.ExaminationSession;
 
 public interface ExaminationSessionService {
 	
-	ExaminationSession createExamSessionForACourse(ExaminationSessionDto dto, int courseId);
+	void createExamSessionForACourse(String courseId, ExaminationSessionDto dto);
 	
 	
 	ExaminationSession closeExamSessionForACourse(int courseId);

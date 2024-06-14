@@ -49,7 +49,7 @@ public class Course {
 	@ManyToMany(mappedBy="coursesTaken", fetch=FetchType.EAGER)
 	private List<Student> studentEnrolled = new ArrayList<>();
 	
-	@OneToMany(mappedBy="course")
+	@OneToMany(mappedBy="course",  fetch=FetchType.LAZY)
 	private List<Question> allAvailableQuestions = new ArrayList<>();
 	
 	@CreationTimestamp
