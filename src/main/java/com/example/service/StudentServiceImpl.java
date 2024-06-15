@@ -32,8 +32,10 @@ public class StudentServiceImpl implements StudentService {
 
 	private ModelMapper modelMapper;
 
-	private Map<String, String> propertyMap = Map.of("first_name", "firstName", "last_name", "lastName", "middle_name",
+	private Map<String, String> propertyStudent = Map.of("first_name", "firstName", "last_name", "lastName", "middle_name",
 			"middleName");
+	
+	private Map<String, String> propertyCourse = Map.of("course_name", "courseName", "course_code", "courseCode");
 
 	public StudentServiceImpl(StudentRepository studentRepository, CourseRepository courseRepository,
 			ModelMapper modelMapper) {
@@ -78,7 +80,7 @@ public class StudentServiceImpl implements StudentService {
 	@Override
 	public Page<StudentDto> getAllStudents(int pageNum, int pageSize, String sortOptions, String search) {
 
-		Sort sort = prepareSortByFields(sortOptions);
+		Sort sort = prepareSortByFields(sortOptions, propertyStudent);
 
 		Pageable pageable = PageRequest.of(pageNum, pageSize, sort);
 
@@ -92,7 +94,7 @@ public class StudentServiceImpl implements StudentService {
 		return new PageImpl<>(listDto, pageable, studentPage.getTotalElements());
 	}
 
-	private Sort prepareSortByFields(String sortOptions) {
+	private Sort prepareSortByFields(String sortOptions, Map<String, String> propertyMap) {
 		Sort sort = Sort.unsorted();
 
 		String[] sortFields = sortOptions.split(",");
@@ -121,13 +123,16 @@ public class StudentServiceImpl implements StudentService {
 		Course course = modelMapper.map(courseDto, Course.class);
 
 		student.getCoursesTaken().add(course);
+		
+		course.getStudentEnrolled().add(student);
+		
 
-		studentRepository.save(student);
+		courseRepository.save(course);
 
 	}
 
 	@Override
-	public List<CourseDto> getEnrolledCoursesForAStudent(String studentId, int pageNum, int pageSize,
+	public Page<CourseDto> getEnrolledCoursesForAStudent(String studentId, int pageNum, int pageSize,
 			String sortOptions, String search) {
 		StudentDto dto = checkIfStudentExist(studentId);
 
@@ -135,12 +140,19 @@ public class StudentServiceImpl implements StudentService {
 			throw new NoCourseAvailableException("You don't have any enrolled course");
 		}
 		
-		Sort sort = prepareSortByFields(sortOptions);
+		Sort sort = prepareSortByFields(sortOptions, propertyCourse);
 		
 		Pageable pageable = PageRequest.of(pageNum, pageSize, sort);
 		
-		Page<Course> coursePage = null;
+		int id = dto.getId();
+		
+		Page<Course> coursePage = courseRepository.findCoursesEnrolledByStudent(id, pageable, search);
 
-		return dto.getCoursesTaken();
+		java.lang.reflect.Type typeToken = new TypeToken<List<CourseDto>>() {}.getType();
+		List<CourseDto> listDto = modelMapper.map(coursePage.getContent(), typeToken);
+		
+		Page<CourseDto> dtoPage = new PageImpl<>(listDto, pageable, coursePage.getTotalElements());
+		
+		return dtoPage;
 	}
 }

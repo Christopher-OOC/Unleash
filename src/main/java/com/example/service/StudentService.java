@@ -18,6 +18,6 @@ public interface StudentService {
 	
 	void enrollForACourse(String studentId, String courseId);
 	
-	List<CourseDto> getEnrolledCoursesForAStudent(String studentId, int pageNum, int pageSize, String sortOptions, String search);
+	Page<CourseDto> getEnrolledCoursesForAStudent(String studentId, int pageNum, int pageSize, String sortOptions, String search);
 
 }

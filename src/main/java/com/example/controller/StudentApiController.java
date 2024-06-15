@@ -1,5 +1,6 @@
 package com.example.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +26,7 @@ import com.example.exceptions.BadRequestException;
 import com.example.model.dto.CourseDto;
 import com.example.model.dto.StudentDto;
 import com.example.model.requestmodel.StudentRequestModel;
+import com.example.model.responsemodel.CourseResponseModel;
 import com.example.model.responsemodel.RequestStatusType;
 import com.example.model.responsemodel.ResponseMessageModel;
 import com.example.model.responsemodel.ResponseStatusType;
@@ -46,8 +48,8 @@ public class StudentApiController {
 
 	private ModelMapper modelMapper;
 
-	private Map<String, String> propertyStudent = Map.of("first_name", "firstName", "last_name", "lastName", "middle_name",
-			"middleName");
+	private Map<String, String> propertyStudent = Map.of("first_name", "firstName", "last_name", "lastName",
+			"middle_name", "middleName");
 
 	private Map<String, String> propertyCourse = Map.of("course_name", "courseName", "course_code", "courseCode");
 
@@ -142,18 +144,29 @@ public class StudentApiController {
 			@RequestParam(value = "search", required = false, defaultValue = "") String search) {
 
 		validateSortFields(sortOptions, propertyCourse);
-		
-		List<CourseDto> allEnrolledCourses = studentService.getEnrolledCoursesForAStudent(studentId, pageNum, pageSize, sortOptions, search);
 
-		return ResponseEntity.ok(allEnrolledCourses);
+		Page<CourseDto> allEnrolledCourses = studentService.getEnrolledCoursesForAStudent(studentId, pageNum - 1,
+				pageSize, sortOptions, search);
+		
+		List<CourseDto> listDto = allEnrolledCourses.getContent();
+		
+		List<CourseResponseModel> listResponse = new ArrayList<>();
+
+		listDto.forEach(dto -> {
+			CourseResponseModel response = modelMapper.map(dto, CourseResponseModel.class);
+			response.setNumberOfStudentEnrolled(dto.getStudentEnrolled().size());
+			listResponse.add(response);
+		});
+		
+		return ResponseEntity.ok(listResponse);
 	}
-	
+
 	private void validateSortFields(String sortOptions, Map<String, String> propertyMap) {
 		String[] arrSortFields = sortOptions.split(",");
-		
+
 		for (String sortField : arrSortFields) {
 			String actualField = sortField.replace("-", "");
-			
+
 			if (!propertyMap.keySet().contains(actualField)) {
 				throw new BadRequestException("Invalid sort field: " + actualField);
 			}
