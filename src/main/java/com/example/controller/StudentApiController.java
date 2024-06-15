@@ -11,6 +11,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import org.springframework.data.domain.Page;
+import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.PagedModel.PageMetadata;
 import org.springframework.http.ResponseEntity;
@@ -81,12 +82,12 @@ public class StudentApiController {
 
 		StudentResponseModel response = modelMapper.map(dto, StudentResponseModel.class);
 
-		addSelfLinks(List.of(response));
+		addStudentSelfLinks(List.of(response));
 
 		return ResponseEntity.ok(response);
 	}
 
-	private void addSelfLinks(List<StudentResponseModel> listResponse) {
+	private void addStudentSelfLinks(List<StudentResponseModel> listResponse) {
 		listResponse.forEach(response -> {
 			response.add(linkTo(methodOn(getClass()).getStudentById(response.getStudentId())).withSelfRel());
 		});
@@ -111,7 +112,7 @@ public class StudentApiController {
 		}.getType();
 		List<StudentResponseModel> listResponse = modelMapper.map(listDto, typeToken);
 
-		addSelfLinks(listResponse);
+		addStudentSelfLinks(listResponse);
 
 		long totalElements = studentPage.getTotalElements();
 		long totalPages = studentPage.getTotalPages();
@@ -158,8 +159,52 @@ public class StudentApiController {
 			listResponse.add(response);
 		});
 		
-		return ResponseEntity.ok(listResponse);
+		addCourseSelfLinks(listResponse);
+		
+		long totalElements = allEnrolledCourses.getTotalElements();
+		int totalPages = allEnrolledCourses.getTotalPages();
+		
+		PageMetadata metadata = new PageMetadata(pageSize, pageNum, totalElements, totalPages);
+		
+		PagedModel<CourseResponseModel> pagedModel = PagedModel.of(listResponse, metadata);
+		
+		addNavigationLiksToCollectionModel(pagedModel, studentId, pageNum, pageSize, sortOptions, search, totalPages);
+		
+		return ResponseEntity.ok(pagedModel);
 	}
+	
+	private void addCourseSelfLinks(List<CourseResponseModel> listResponse) {
+		listResponse.forEach(response -> {
+			response.add(linkTo(methodOn(getClass()).getStudentById(response.getCourseId())).withSelfRel());
+		});
+	}
+	
+	private void addNavigationLiksToCollectionModel(PagedModel<CourseResponseModel> pagedModel, String studentId,  int pageNum,
+			int pageSize, String sortOptions, String filterField, int totalPages) {
+
+		// Add self link
+		pagedModel.add(
+				linkTo(methodOn(getClass()).getAllCourseEnrolledByStudent(studentId, pageNum, pageSize, sortOptions, filterField)).withSelfRel());
+
+		if (pageNum < totalPages) {
+			pagedModel
+					.add(linkTo(methodOn(getClass()).getAllCourseEnrolledByStudent(studentId, pageNum + 1, pageSize, sortOptions, filterField))
+							.withRel(IanaLinkRelations.NEXT));
+
+			pagedModel
+					.add(linkTo(methodOn(getClass()).getAllCourseEnrolledByStudent(studentId, totalPages, pageSize, sortOptions, filterField))
+							.withRel(IanaLinkRelations.LAST));
+		}
+
+		if (pageNum > 1) {
+
+			pagedModel
+					.add(linkTo(methodOn(getClass()).getAllCourseEnrolledByStudent(studentId, pageNum - 1, pageSize, sortOptions, filterField))
+							.withRel(IanaLinkRelations.PREV));
+		}
+
+	}
+
 
 	private void validateSortFields(String sortOptions, Map<String, String> propertyMap) {
 		String[] arrSortFields = sortOptions.split(",");
