@@ -2,6 +2,7 @@ package com.example.model.entity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -27,7 +28,9 @@ public class Question {
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	private int questionId;
+	private long id;
+	
+	private String questionId;
 	
 	@Lob
 	@Column(columnDefinition="MEDIUMBLOB")
@@ -39,6 +42,25 @@ public class Question {
 	private Course course;
 	
 	@OneToMany(mappedBy="question", fetch=FetchType.EAGER, cascade=CascadeType.ALL)
-	private List<QuestionOption> options = new ArrayList<>(); 
+	private List<QuestionOption> options = new ArrayList<>();
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Question other = (Question) obj;
+		return id == other.id;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	} 
+	
+	
 
 }

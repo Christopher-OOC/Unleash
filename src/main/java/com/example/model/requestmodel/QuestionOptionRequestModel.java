@@ -1,22 +1,18 @@
-package com.example.model.dto;
+package com.example.model.requestmodel;
 
 import java.util.Objects;
 
-import com.example.model.entity.Question;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class QuestionOptionDto {
-
-	private long optionId;
-
-	private Question question;
-
+public class QuestionOptionRequestModel {
+	
 	private String optionValue;
-
+	
 	private boolean isCorrect;
 
 	@Override
@@ -27,12 +23,14 @@ public class QuestionOptionDto {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		QuestionOptionDto other = (QuestionOptionDto) obj;
-		return optionId == other.optionId;
+		QuestionOptionRequestModel other = (QuestionOptionRequestModel) obj;
+		return isCorrect == other.isCorrect && Objects.equals(optionValue, other.optionValue);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(optionId);
+		return Objects.hash(isCorrect, optionValue);
 	}
+	
+	
 }

@@ -4,7 +4,7 @@ public class NoQuestionAvailableForTheCourseException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 
-	public NoQuestionAvailableForTheCourseException(int courseId) {
+	public NoQuestionAvailableForTheCourseException(String courseId) {
 		super("No question available for the course with ID: " + courseId);
 	}
 

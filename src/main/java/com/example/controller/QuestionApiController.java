@@ -14,6 +14,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.model.dto.QuestionDto;
 import com.example.model.entity.Question;
+import com.example.model.requestmodel.QuestionRequestModel;
+import com.example.model.responsemodel.QuestionResponseModel;
+import com.example.model.responsemodel.RequestStatusType;
+import com.example.model.responsemodel.ResponseMessageModel;
+import com.example.model.responsemodel.ResponseStatusType;
 import com.example.service.CourseService;
 import com.example.service.QuestionService;
 
@@ -38,27 +43,31 @@ public class QuestionApiController {
 	}
 	
 	@PostMapping("/{courseId}")
-	public ResponseEntity<?> addQuestionToCourse(@RequestBody @Valid QuestionDto questionDto, @PathVariable("courseId") int courseId) {
+	public ResponseEntity<?> addQuestionToCourse(@RequestBody @Valid QuestionRequestModel requestModel, @PathVariable("courseId") String courseId) {
 		
-		Question question = questionService.addANewQuestionForACourse(questionDto, courseId);
+		QuestionDto questionDto = modelMapper.map(requestModel, QuestionDto.class);
 		
-		log.info("Question: {}", question);
+		QuestionDto savedQuestion = questionService.addANewQuestionForACourse(questionDto, courseId);
 		
-		URI uri = URI.create("/v1/questions/" + courseId + "/" + question.getQuestionId());
+		QuestionResponseModel response = modelMapper.map(savedQuestion, QuestionResponseModel.class);
 		
-		QuestionDto dto = modelMapper.map(question, QuestionDto.class); 
+//		ResponseMessageModel message = new ResponseMessageModel();
+//		message.setRequestStatusType(RequestStatusType.UPLOADED);
+//		message.setResponseStatusType(ResponseStatusType.SUCCESS);
 		
-		return ResponseEntity.created(uri).body(dto);
+		return ResponseEntity.ok(response);
 	}
 	
 	@PatchMapping("/{questionId}")
-	public ResponseEntity<?> updateAQuestionForACourse(@RequestBody @Valid QuestionDto questionDto, @PathVariable("questionId") @Valid int questionId) {
+	public ResponseEntity<?> updateAQuestionForACourse(@RequestBody @Valid QuestionRequestModel requestModel, @PathVariable("questionId") String questionId) {
 		
-		Question updatedQuestion = questionService.updateAQuestionForACourse(questionDto, questionId);
+		QuestionDto questionDto = modelMapper.map(requestModel, QuestionDto.class);
 		
-		QuestionDto dto = modelMapper.map(updatedQuestion, QuestionDto.class); 
+		QuestionDto updatedQuestion = questionService.updateAQuestionForACourse(questionDto, questionId);
 		
-		return ResponseEntity.ok(dto);
+		QuestionResponseModel response = modelMapper.map(updatedQuestion, QuestionResponseModel.class);
+		
+		return ResponseEntity.ok(response);
 	}
 
 }

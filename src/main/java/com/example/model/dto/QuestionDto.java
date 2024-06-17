@@ -1,24 +1,26 @@
 package com.example.model.dto;
 
 import java.util.ArrayList;
+
 import java.util.List;
 import java.util.Objects;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.example.model.entity.Course;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-@JsonPropertyOrder({"questionId", "question", "options"})
 public class QuestionDto {
 	
-	@JsonProperty("question_id")
-	private int questionId;
+	private long id;
+	
+	private String questionId;
 	
 	private String question;
+	
+	private Course course;
 	
 	private List<QuestionOptionDto> options = new ArrayList<>();
 

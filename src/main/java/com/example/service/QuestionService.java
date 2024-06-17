@@ -7,12 +7,12 @@ import com.example.model.entity.Question;
 
 public interface QuestionService {
 	
-	Question getQuestionById(int questionId);
+	Question getQuestionById(String questionId);
 	
-	List<Question> getAllAvailableQuestionForACourse(int courseId);
+	List<Question> getAllAvailableQuestionForACourse(String courseId);
 	
-	Question addANewQuestionForACourse(QuestionDto questionDto, int courseId);
+	QuestionDto addANewQuestionForACourse(QuestionDto questionDto, String courseId);
 	
-	Question updateAQuestionForACourse(QuestionDto questionDto,int questionId);
+	QuestionDto updateAQuestionForACourse(QuestionDto questionDto, String questionId);
 
 }

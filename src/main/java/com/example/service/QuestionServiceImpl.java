@@ -14,6 +14,7 @@ import com.example.model.entity.Course;
 import com.example.model.entity.Question;
 import com.example.repository.CourseRepository;
 import com.example.repository.QuestionRepository;
+import com.example.utilities.PublicIdGeneratorUtils;
 
 @Service
 public class QuestionServiceImpl implements QuestionService {
@@ -35,12 +36,12 @@ public class QuestionServiceImpl implements QuestionService {
 	}
 	
 	@Override
-	public Question getQuestionById(int questionId) {
+	public Question getQuestionById(String questionId) {
 		return checkIfQuestionExists(questionId);
 	}
 
-	private Question checkIfQuestionExists(int questionId) {
-		Optional<Question> optional = questionRepository.findById(questionId);
+	private Question checkIfQuestionExists(String questionId) {
+		Optional<Question> optional = questionRepository.findByQuestionId(questionId);
 		
 		if (optional.isEmpty()) {
 			throw new NoSuchQuestionFoundException(questionId);
@@ -50,13 +51,13 @@ public class QuestionServiceImpl implements QuestionService {
 	}
 
 	@Override
-	public List<Question> getAllAvailableQuestionForACourse(int courseId) {
+	public List<Question> getAllAvailableQuestionForACourse(String courseId) {
 		checkIfCourseExists(courseId);
 		
 		return checkIfAnyQuestion(courseId);
 	}
 
-	private List<Question> checkIfAnyQuestion(int courseId) {
+	private List<Question> checkIfAnyQuestion(String courseId) {
 		List<Question> questions = questionRepository.getAllAvailableQuestionForACourse(courseId);
 		
 		if (questions.isEmpty()) {
@@ -66,8 +67,8 @@ public class QuestionServiceImpl implements QuestionService {
 		return questions;
 	}
 
-	private Course checkIfCourseExists(int courseId) {
-		Optional<Course> optional = courseRepository.findById(courseId);
+	private Course checkIfCourseExists(String courseId) {
+		Optional<Course> optional = courseRepository.findByCourseId(courseId);
 		
 		if (optional.isEmpty()) {
 			throw new NoSuchCourseFoundException("" + courseId);
@@ -77,11 +78,12 @@ public class QuestionServiceImpl implements QuestionService {
 	}
 
 	@Override
-	public Question addANewQuestionForACourse(QuestionDto questionDto, int courseId) {
+	public QuestionDto addANewQuestionForACourse(QuestionDto questionDto, String courseId) {
 		
 		Course course = checkIfCourseExists(courseId);
 		
 		Question question = modelMapper.map(questionDto, Question.class);
+		question.setQuestionId(PublicIdGeneratorUtils.generateId(30));
 		
 		question.getOptions().forEach(option -> {
 			option.setQuestion(question);
@@ -91,11 +93,11 @@ public class QuestionServiceImpl implements QuestionService {
 
 		Question savedQuestion = questionRepository.save(question);
 		
-		return savedQuestion;
+		return modelMapper.map(savedQuestion, QuestionDto.class);
 	}
 
 	@Override
-	public Question updateAQuestionForACourse(QuestionDto questionDto, int questionId) {
+	public QuestionDto updateAQuestionForACourse(QuestionDto questionDto, String questionId) {
 		
 		checkIfQuestionExists(questionId);
 		
@@ -106,7 +108,9 @@ public class QuestionServiceImpl implements QuestionService {
 			option.setQuestion(updatedQuestion);
 		});
 		
-		return questionRepository.save(updatedQuestion);
+		Question savedQuestion = questionRepository.save(updatedQuestion);
+		
+		return modelMapper.map(savedQuestion, QuestionDto.class);
 	}
 
 }
