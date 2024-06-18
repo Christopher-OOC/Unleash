@@ -15,6 +15,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,16 +28,20 @@ import com.example.exceptions.PasswordNotTheSameException;
 import com.example.model.dto.CourseDto;
 import com.example.model.dto.ExaminationSessionDto;
 import com.example.model.dto.InstructorDto;
+import com.example.model.dto.QuestionDto;
 import com.example.model.requestmodel.CourseRequestModel;
 import com.example.model.requestmodel.ExaminationSessionRequestModel;
 import com.example.model.requestmodel.InstructorRequestModel;
+import com.example.model.requestmodel.QuestionRequestModel;
 import com.example.model.responsemodel.CourseResponseModel;
+import com.example.model.responsemodel.QuestionResponseModel;
 import com.example.model.responsemodel.RequestStatusType;
 import com.example.model.responsemodel.ResponseMessageModel;
 import com.example.model.responsemodel.ResponseStatusType;
 import com.example.service.CourseService;
 import com.example.service.ExaminationSessionService;
 import com.example.service.InstructorService;
+import com.example.service.QuestionService;
 import com.example.utilities.PublicIdGeneratorUtils;
 
 import jakarta.validation.Valid;
@@ -157,7 +162,7 @@ public class InstructorApiController {
 	@PostMapping("/{courseId}/exam-session")
 	public ResponseEntity<?> createAnExaminaionSession(@RequestBody @Valid ExaminationSessionRequestModel requestModel,
 			@PathVariable("courseId") String courseId) {
-		
+
 		ExaminationSessionDto dto = modelMapper.map(requestModel, ExaminationSessionDto.class);
 
 		examinationSessionService.createExamSessionForACourse(courseId, dto);
@@ -165,8 +170,34 @@ public class InstructorApiController {
 		ResponseMessageModel message = new ResponseMessageModel();
 		message.setResponseStatusType(ResponseStatusType.SUCCESS);
 		message.setRequestStatusType(RequestStatusType.CREATED);
-		
+
 		return ResponseEntity.created(null).body(message);
+	}
+
+	@PostMapping("/{instructorId}/{courseId}/questions")
+	public ResponseEntity<?> addQuestionToCourse(@RequestBody @Valid QuestionRequestModel requestModel,
+			@PathVariable("instructorId") String instructorId, @PathVariable("courseId") String courseId) {
+
+		QuestionDto questionDto = modelMapper.map(requestModel, QuestionDto.class);
+
+		QuestionDto savedQuestion = instructorService.addANewQuestionForACourse(questionDto, courseId);
+
+		QuestionResponseModel response = modelMapper.map(savedQuestion, QuestionResponseModel.class);
+
+		return ResponseEntity.ok(response);
+	}
+
+	@PatchMapping("/{instructorId}/{courseId}/questions")
+	public ResponseEntity<?> updateAQuestionForACourse(@RequestBody @Valid QuestionRequestModel requestModel,
+			@PathVariable("instructorId") String instructorId, @PathVariable("questionId") String questionId) {
+
+		QuestionDto questionDto = modelMapper.map(requestModel, QuestionDto.class);
+
+		QuestionDto updatedQuestion = instructorService.updateAQuestionForACourse(questionDto, questionId);
+
+		QuestionResponseModel response = modelMapper.map(updatedQuestion, QuestionResponseModel.class);
+
+		return ResponseEntity.ok(response);
 	}
 
 }

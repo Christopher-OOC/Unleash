@@ -2,6 +2,7 @@ package com.example.controller;
 
 import java.net.URI;
 
+
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -25,7 +26,6 @@ import com.example.service.QuestionService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @RestController
 @RequestMapping("/v1/questions")
 @Validated
@@ -40,34 +40,6 @@ public class QuestionApiController {
 		super();
 		this.questionService = questionService;
 		this.modelMapper = modelMapper;
-	}
-	
-	@PostMapping("/{courseId}")
-	public ResponseEntity<?> addQuestionToCourse(@RequestBody @Valid QuestionRequestModel requestModel, @PathVariable("courseId") String courseId) {
-		
-		QuestionDto questionDto = modelMapper.map(requestModel, QuestionDto.class);
-		
-		QuestionDto savedQuestion = questionService.addANewQuestionForACourse(questionDto, courseId);
-		
-		QuestionResponseModel response = modelMapper.map(savedQuestion, QuestionResponseModel.class);
-		
-//		ResponseMessageModel message = new ResponseMessageModel();
-//		message.setRequestStatusType(RequestStatusType.UPLOADED);
-//		message.setResponseStatusType(ResponseStatusType.SUCCESS);
-		
-		return ResponseEntity.ok(response);
-	}
-	
-	@PatchMapping("/{questionId}")
-	public ResponseEntity<?> updateAQuestionForACourse(@RequestBody @Valid QuestionRequestModel requestModel, @PathVariable("questionId") String questionId) {
-		
-		QuestionDto questionDto = modelMapper.map(requestModel, QuestionDto.class);
-		
-		QuestionDto updatedQuestion = questionService.updateAQuestionForACourse(questionDto, questionId);
-		
-		QuestionResponseModel response = modelMapper.map(updatedQuestion, QuestionResponseModel.class);
-		
-		return ResponseEntity.ok(response);
 	}
 
 }

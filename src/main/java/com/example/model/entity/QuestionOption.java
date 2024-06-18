@@ -24,7 +24,7 @@ public class QuestionOption {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private long optionId;
 	
-	@ManyToOne(fetch=FetchType.EAGER, cascade=CascadeType.ALL)
+	@ManyToOne(fetch=FetchType.EAGER)
 	@JoinColumn(name="question_id")
 	private Question question;
 	
@@ -47,6 +47,12 @@ public class QuestionOption {
 	@Override
 	public int hashCode() {
 		return Objects.hash(optionId);
+	}
+
+	@Override
+	public String toString() {
+		return "QuestionOption [optionId=" + optionId + ", optionValue=" + optionValue + ", isCorrect=" + isCorrect
+				+ "]";
 	}
 	
 }

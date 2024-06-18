@@ -14,13 +14,19 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.example.exceptions.NoCourseAvailableException;
+import com.example.exceptions.NoSuchCourseFoundException;
 import com.example.exceptions.NoSuchInstructorException;
+import com.example.exceptions.NoSuchQuestionFoundException;
 import com.example.model.dto.CourseDto;
 import com.example.model.dto.InstructorDto;
+import com.example.model.dto.QuestionDto;
 import com.example.model.entity.Course;
 import com.example.model.entity.Instructor;
+import com.example.model.entity.Question;
 import com.example.repository.CourseRepository;
 import com.example.repository.InstructorRepository;
+import com.example.repository.QuestionRepository;
+import com.example.utilities.PublicIdGeneratorUtils;
 
 @Service
 public class InstructorServiceImpl implements InstructorService {
@@ -28,6 +34,8 @@ public class InstructorServiceImpl implements InstructorService {
 	private CourseRepository courseRepository;
 
 	private InstructorRepository instructorRepository;
+	
+	private QuestionRepository questionRepository;
 
 	private ModelMapper modelMapper;
 	
@@ -96,5 +104,62 @@ public class InstructorServiceImpl implements InstructorService {
 
 		return optional.get();
 	}
+	
+	@Override
+	public QuestionDto addANewQuestionForACourse(QuestionDto questionDto, String courseId) {
+		
+		Course course = checkIfCourseExists(courseId);
+		
+		Question question = modelMapper.map(questionDto, Question.class);
+		question.setQuestionId(PublicIdGeneratorUtils.generateId(30));
+		
+		question.getOptions().forEach(option -> {
+			option.setQuestion(question);
+		});
+		
+		question.setCourse(course);
 
+		Question savedQuestion = questionRepository.save(question);
+		
+		return modelMapper.map(savedQuestion, QuestionDto.class);
+	}
+
+	@Override
+	public QuestionDto updateAQuestionForACourse(QuestionDto questionDto, String questionId) {
+		
+		Question formalQuestion = checkIfQuestionExists(questionId);
+		
+		Question updatedQuestion = modelMapper.map(questionDto, Question.class);
+		updatedQuestion.setId(formalQuestion.getId());
+		updatedQuestion.setQuestionId(questionId);
+		
+		updatedQuestion.getOptions().forEach(option -> {
+			option.setQuestion(updatedQuestion);
+		});
+		
+		
+		Question savedQuestion = questionRepository.save(updatedQuestion);
+		
+		return modelMapper.map(savedQuestion, QuestionDto.class);
+	}
+	
+	private Question checkIfQuestionExists(String questionId) {
+		Optional<Question> optional = questionRepository.findByQuestionId(questionId);
+		
+		if (optional.isEmpty()) {
+			throw new NoSuchQuestionFoundException(questionId);
+		}
+		
+		return optional.get();
+	}
+
+	private Course checkIfCourseExists(String courseId) {
+		Optional<Course> optional = courseRepository.findByCourseId(courseId);
+		
+		if (optional.isEmpty()) {
+			throw new NoSuchCourseFoundException("" + courseId);
+		}
+		
+		return optional.get();
+	}
 }
