@@ -129,7 +129,6 @@ public class CourseApiController {
 		listResponse.forEach(courseResponse -> {
 			courseResponse.add(linkTo(methodOn(getClass()).getCourseById(courseResponse.getCourseId())).withSelfRel());
 		});
-
 	}
 
 	@GetMapping("/{courseId}")
