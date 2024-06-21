@@ -43,4 +43,5 @@ public class ExaminationDto {
 		result = prime * result + Objects.hash(examinationId);
 		return result;
 	}
+
 }

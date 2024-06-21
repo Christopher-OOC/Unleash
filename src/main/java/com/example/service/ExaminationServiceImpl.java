@@ -25,6 +25,7 @@ import com.example.model.entity.ExaminationId;
 import com.example.model.entity.ExaminationQuestionAnswer;
 import com.example.model.entity.ExaminationQuestionOption;
 import com.example.model.entity.ExaminationSession;
+import com.example.model.entity.ExaminationStatus;
 import com.example.model.entity.Question;
 import com.example.model.entity.QuestionOption;
 import com.example.model.entity.Student;
@@ -112,16 +113,10 @@ public class ExaminationServiceImpl implements ExaminationService {
 		
 		//Save Examination
 		Examination savedExamination = examinationRepository.save(newExamination);
+		savedExamination.setStatus(ExaminationStatus.ONGOING);
 		
 		//To ExaminationDto
 		ExaminationDto examDto = modelMapper.map(savedExamination, ExaminationDto.class);
-		
-//		var questionAnswer = questionAnswerRepository.findExaminationNextQuestion(session.getExaminationSessionId(), studentId);
-//		var questionAnswerDto = modelMapper.map(questionAnswer, ExaminationQuestionAnswerDto.class);
-		
-		//examDto.setNextQuestion(questionAnswerDto);
-		
-		//examDto.add(linkTo(methodOn(ExaminationApiController.class).submitPrevoiusAndGetNextQuestion(null)).withRel("next_question"));
 		
 		return examDto;
 	}
@@ -156,7 +151,7 @@ public class ExaminationServiceImpl implements ExaminationService {
 	}
 
 	@Override
-	public Examination endExamination(String courseId, String studentId) {
+	public ExaminationDto endExamination(String courseId, String studentId) {
 		checkIfCourseExist(courseId);
 
 		// Get Current Exam Session
@@ -171,11 +166,16 @@ public class ExaminationServiceImpl implements ExaminationService {
 		id.setStudentId(student);
 
 		Examination examination = checkIfExaminationOngoing(studentId, id);
+		examination.setStatus(ExaminationStatus.ENDED);
 
 		// Set the end time
 		examination.setEndTime(new Date());
 
-		return examinationRepository.save(examination);
+		Examination endExamination = examinationRepository.save(examination);
+		
+		ExaminationDto endExaminationDto = modelMapper.map(endExamination, ExaminationDto.class);
+		
+		return endExaminationDto;
 	}
 
 	private Examination checkIfExaminationOngoing(String studentId, ExaminationId id) {
@@ -184,9 +184,16 @@ public class ExaminationServiceImpl implements ExaminationService {
 		if (optionalExamination.isEmpty()) {
 			throw new NoOngoingExaminationException(studentId);
 		}
-
+		
 		Examination examination = optionalExamination.get();
-		return examination;
+
+		if (examination.getStatus() == ExaminationStatus.ONGOING) {
+			return examination;
+		}
+		else {
+			throw new RuntimeException("The examination has ended");
+		}
+		
 	}
 
 	@Override
@@ -221,24 +228,18 @@ public class ExaminationServiceImpl implements ExaminationService {
 	}
 	
 	@Override
-	public ExaminationDto submitPrevoiusAndGetNextQuestion(ExaminationDto examDto) {
+	public ExaminationDto submitPrevoiusQuestion(ExaminationDto examDto) {
 		Examination exam = modelMapper.map(examDto, Examination.class);
 		
-//		var questionAnswerDto = examDto.getNextQuestion();
-//		
-//		var questionAnswer = modelMapper.map(questionAnswerDto, ExaminationQuestionAnswer.class);
-//		questionAnswer.setExaminationId(exam);
-//		questionAnswer.setAttempted(true);
-//		
-//		questionAnswerRepository.save(questionAnswer);
-//		
-//		var nextQuestion = questionAnswerRepository.findExaminationNextQuestion(examDto.getSessionId(), examDto.getStudentId());
-//		var nextQuestionDto = modelMapper.map(nextQuestion, ExaminationQuestionAnswerDto.class);
-//		
-//		examDto.setNextQuestion(nextQuestionDto);
-//		examDto.removeLinks();
-//		examDto.add(linkTo(methodOn(ExaminationApiController.class).submitPrevoiusAndGetNextQuestion(null)).withRel("next_question"));
-//		
+		ExaminationQuestionAnswerDto questionAnswerDto = examDto.getPreviousQuestion();
+		
+		ExaminationQuestionAnswer questionAnswer = modelMapper.map(questionAnswerDto, ExaminationQuestionAnswer.class);
+		
+		questionAnswer.setExaminationId(exam);
+		questionAnswer.setAttempted(true);
+		
+		questionAnswerRepository.save(questionAnswer);
+		
 		return examDto;
 	}
 

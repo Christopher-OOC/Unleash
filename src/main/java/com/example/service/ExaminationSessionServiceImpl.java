@@ -69,4 +69,11 @@ public class ExaminationSessionServiceImpl implements ExaminationSessionService 
 		return null;
 	}
 
+	@Override
+	public ExaminationSessionDto getCurrentExaminationSession(String courseId) {
+		
+		
+		return null;
+	}
+
 }

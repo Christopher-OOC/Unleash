@@ -21,7 +21,7 @@ public class ExaminationId implements Serializable {
 	@JoinColumn(name="examination_session_id")
 	private ExaminationSession sessionId;
 	
-	@OneToOne
+	@ManyToOne
 	@JoinColumn(name="student_id")
 	private Student studentId;
 

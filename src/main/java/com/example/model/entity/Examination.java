@@ -10,6 +10,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
@@ -32,6 +34,9 @@ public class Examination {
 	@JoinTable(name="examination_questions", joinColumns= {@JoinColumn(name="examination_session_id"), @JoinColumn(name="student_id")}, 
 		inverseJoinColumns=@JoinColumn(name="examination_question_id"))
 	private List<ExaminationQuestionAnswer> examinationQuestions = new ArrayList<>();
+	
+	@Enumerated(EnumType.STRING)
+	private ExaminationStatus status = ExaminationStatus.NOT_STARTED;
 	
 	@CreationTimestamp
 	private Date startTime;
