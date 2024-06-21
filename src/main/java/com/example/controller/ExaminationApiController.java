@@ -11,8 +11,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.model.dto.ExaminationDto;
+import com.example.model.dto.ExaminationQuestionAnswerDto;
 import com.example.model.dto.ExaminationResultDto;
 import com.example.model.entity.Examination;
+import com.example.model.responsemodel.ExaminationQuestionAnswerResponseModel;
+import com.example.model.responsemodel.ExaminationResponseModel;
 import com.example.service.ExaminationService;
 
 @RestController
@@ -29,17 +32,28 @@ public class ExaminationApiController {
 		this.modelMapper = modelMapper;
 	}
 
-	@GetMapping
-	public ResponseEntity<?> startExamination(@RequestParam("courseId") String courseId,
-			@RequestParam("studentId") String studentId) {
+	@GetMapping("/{studentId}/{courseId}")
+	public ResponseEntity<?> startExamination(@PathVariable("studentId") String studentId, @PathVariable("courseId")String courseId) {
 		ExaminationDto examinationDto = examinationService.startExamination(courseId, studentId);
-
-		return ResponseEntity.ok(examinationDto);
+		
+		int sessionId = examinationDto.getExaminationId().getSessionId().getExaminationSessionId();
+		
+		ExaminationResponseModel response = modelMapper.map(examinationDto, ExaminationResponseModel.class);
+		response.setSessionId(sessionId);
+		response.setStudentId(examinationDto.getExaminationId().getStudentId().getStudentId());
+		
+		ExaminationQuestionAnswerDto nextQuestion = examinationService.getNextQuestion(sessionId, studentId);
+		
+		ExaminationQuestionAnswerResponseModel responseNextQuestion = modelMapper.map(nextQuestion, ExaminationQuestionAnswerResponseModel.class);
+		
+		response.setNextQuestion(responseNextQuestion);
+		
+		return ResponseEntity.ok(response);
 	}
 
-	@PostMapping
-	public ResponseEntity<?> endExamination(@RequestParam("courseId")String courseId,
-			@RequestParam("studentId") String studentId) {
+	@PostMapping("/{studentId}/{courseId}")
+	public ResponseEntity<?> endExamination(@PathVariable("studentId") String studentId, @PathVariable("courseId")String courseId) {
+		
 		Examination examination = examinationService.endExamination(courseId, studentId);
 
 		return ResponseEntity.ok(entityToDto(examination));

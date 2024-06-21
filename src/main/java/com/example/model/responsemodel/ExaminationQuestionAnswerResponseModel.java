@@ -1,28 +1,28 @@
-package com.example.model.dto;
+package com.example.model.responsemodel;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
-import com.example.model.entity.Examination;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class ExaminationQuestionAnswerDto {
-	
+public class ExaminationQuestionAnswerResponseModel {
+
 	private int answerId;
 	
 	private String question;
 	
-	private Examination examinationId;
-	
-	private List<ExaminationQuestionOptionDto> examOptions = new ArrayList<>();
+	private List<ExaminationQuestionOptionResponseModel> examOptions = new ArrayList<>();
 	
 	private boolean isAttempted;
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(answerId);
+	}
 
 	@Override
 	public boolean equals(Object obj) {
@@ -32,15 +32,9 @@ public class ExaminationQuestionAnswerDto {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		ExaminationQuestionAnswerDto other = (ExaminationQuestionAnswerDto) obj;
+		ExaminationQuestionAnswerResponseModel other = (ExaminationQuestionAnswerResponseModel) obj;
 		return answerId == other.answerId;
 	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(answerId);
-	}
 	
 	
-
 }

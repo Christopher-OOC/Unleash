@@ -96,7 +96,8 @@ public class ExaminationServiceImpl implements ExaminationService {
 
 		// Get List of Questions
 		List<Question> questions = questionRepository.getExaminationQuestions(courseId, numberOfExaminationQuestion);
-
+		
+		log.info("Question: {}", questions);
 		// Create new Examination
 		Examination newExamination = new Examination();
 		newExamination.setExaminationId(id);
@@ -112,17 +113,15 @@ public class ExaminationServiceImpl implements ExaminationService {
 		//Save Examination
 		Examination savedExamination = examinationRepository.save(newExamination);
 		
-		log.info("Saved Examintion: {}", savedExamination);
-		
 		//To ExaminationDto
 		ExaminationDto examDto = modelMapper.map(savedExamination, ExaminationDto.class);
 		
-		var questionAnswer = questionAnswerRepository.findExaminationNextQuestion(session.getExaminationSessionId(), studentId);
-		var questionAnswerDto = modelMapper.map(questionAnswer, ExaminationQuestionAnswerDto.class);
+//		var questionAnswer = questionAnswerRepository.findExaminationNextQuestion(session.getExaminationSessionId(), studentId);
+//		var questionAnswerDto = modelMapper.map(questionAnswer, ExaminationQuestionAnswerDto.class);
 		
-		examDto.setNextQuestion(questionAnswerDto);
+		//examDto.setNextQuestion(questionAnswerDto);
 		
-		examDto.add(linkTo(methodOn(ExaminationApiController.class).submitPrevoiusAndGetNextQuestion(null)).withRel("next_question"));
+		//examDto.add(linkTo(methodOn(ExaminationApiController.class).submitPrevoiusAndGetNextQuestion(null)).withRel("next_question"));
 		
 		return examDto;
 	}
@@ -225,21 +224,21 @@ public class ExaminationServiceImpl implements ExaminationService {
 	public ExaminationDto submitPrevoiusAndGetNextQuestion(ExaminationDto examDto) {
 		Examination exam = modelMapper.map(examDto, Examination.class);
 		
-		var questionAnswerDto = examDto.getNextQuestion();
-		
-		var questionAnswer = modelMapper.map(questionAnswerDto, ExaminationQuestionAnswer.class);
-		questionAnswer.setExaminationId(exam);
-		questionAnswer.setAttempted(true);
-		
-		questionAnswerRepository.save(questionAnswer);
-		
-		var nextQuestion = questionAnswerRepository.findExaminationNextQuestion(examDto.getSessionId(), examDto.getStudentId());
-		var nextQuestionDto = modelMapper.map(nextQuestion, ExaminationQuestionAnswerDto.class);
-		
-		examDto.setNextQuestion(nextQuestionDto);
-		examDto.removeLinks();
-		examDto.add(linkTo(methodOn(ExaminationApiController.class).submitPrevoiusAndGetNextQuestion(null)).withRel("next_question"));
-		
+//		var questionAnswerDto = examDto.getNextQuestion();
+//		
+//		var questionAnswer = modelMapper.map(questionAnswerDto, ExaminationQuestionAnswer.class);
+//		questionAnswer.setExaminationId(exam);
+//		questionAnswer.setAttempted(true);
+//		
+//		questionAnswerRepository.save(questionAnswer);
+//		
+//		var nextQuestion = questionAnswerRepository.findExaminationNextQuestion(examDto.getSessionId(), examDto.getStudentId());
+//		var nextQuestionDto = modelMapper.map(nextQuestion, ExaminationQuestionAnswerDto.class);
+//		
+//		examDto.setNextQuestion(nextQuestionDto);
+//		examDto.removeLinks();
+//		examDto.add(linkTo(methodOn(ExaminationApiController.class).submitPrevoiusAndGetNextQuestion(null)).withRel("next_question"));
+//		
 		return examDto;
 	}
 
@@ -297,6 +296,16 @@ public class ExaminationServiceImpl implements ExaminationService {
 		answerOption.setOptionValue(option.getOptionValue());
 
 		return answerOption;
+	}
+
+	@Override
+	public ExaminationQuestionAnswerDto getNextQuestion(int sessionId, String studentId) {
+		
+		ExaminationQuestionAnswer nextQuestion = questionAnswerRepository.findExaminationNextQuestion(sessionId, studentId);
+		
+		ExaminationQuestionAnswerDto nextQuestionDto = modelMapper.map(nextQuestion, ExaminationQuestionAnswerDto.class);
+		
+		return nextQuestionDto;
 	}
 
 }

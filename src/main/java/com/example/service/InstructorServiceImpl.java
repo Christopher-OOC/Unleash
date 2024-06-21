@@ -44,10 +44,11 @@ public class InstructorServiceImpl implements InstructorService {
 
 
 	public InstructorServiceImpl(CourseRepository courseRepository, InstructorRepository instructorRepository,
-			ModelMapper modelMapper) {
+			QuestionRepository questionRepository, ModelMapper modelMapper) {
 		super();
 		this.courseRepository = courseRepository;
 		this.instructorRepository = instructorRepository;
+		this.questionRepository = questionRepository;
 		this.modelMapper = modelMapper;
 	}
 
