@@ -111,7 +111,7 @@ public class ExaminationApiController {
 		return ResponseEntity.ok(examInRequest);
 	}
 
-	@GetMapping("{studentId}/{courseId}/{sesionId}results")
+	@GetMapping("{studentId}/{courseId}/{sesionId}/results")
 	public ResponseEntity<?> checkResult(@PathVariable("studentId") String studentId,
 			@PathVariable("courseId") String courseId,
 			@PathVariable("sessionId") int sessionId) {

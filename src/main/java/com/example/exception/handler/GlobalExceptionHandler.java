@@ -19,6 +19,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import com.example.exceptions.BadRequestException;
+import com.example.exceptions.ExaminationNoLongerAvailableException;
 import com.example.exceptions.ExaminationSessionAlreadyCreated;
 import com.example.exceptions.NoCourseAvailableException;
 import com.example.exceptions.NoExaminationSessionException;
@@ -204,6 +205,21 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
 		return error;
 
+	}
+	
+	@ExceptionHandler(ExaminationNoLongerAvailableException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ResponseBody
+	public ErrorDto handleExaminationNoLongerAvailableException(HttpServletRequest request,
+			ExaminationNoLongerAvailableException ex) {
+
+		ErrorDto error = new ErrorDto();
+
+		error.setStatus(HttpStatus.BAD_REQUEST.value());
+		error.setPath(request.getServletPath());
+		error.getMessages().add(ex.getMessage());
+
+		return error;
 	}
 
 	@ExceptionHandler(ConstraintViolationException.class)

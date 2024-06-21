@@ -7,13 +7,12 @@ import java.util.Optional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import com.example.exceptions.NoSuchCourseFoundException;
 import com.example.exceptions.NoSuchStudentFoundException;
 import com.example.exceptions.NotRegisteredForTheCourseException;
-import com.example.controller.ExaminationApiController;
+import com.example.exceptions.ResultNotAvailableException;
+import com.example.exceptions.ExaminationNoLongerAvailableException;
 import com.example.exceptions.NoExaminationSessionException;
 import com.example.exceptions.NoOngoingExaminationException;
 import com.example.model.dto.ExaminationDto;
@@ -87,13 +86,19 @@ public class ExaminationServiceImpl implements ExaminationService {
 		}
 
 		// Get Current Exam Session
-		ExaminationSession session = checkIfSessionExists(courseId);
+		ExaminationSession session = checkIfSession(courseId);
 		
 		log.info("Session: {}", session);
 
 		ExaminationId id = new ExaminationId();
 		id.setSessionId(session);
 		id.setStudentId(student);
+		
+		Optional<Examination> previousExam = examinationRepository.findById(id);
+		
+		if (!previousExam.isEmpty()) {
+			throw new ExaminationNoLongerAvailableException();
+		}
 
 		// Get List of Questions
 		List<Question> questions = questionRepository.getExaminationQuestions(courseId, numberOfExaminationQuestion);
@@ -112,8 +117,8 @@ public class ExaminationServiceImpl implements ExaminationService {
 		});
 		
 		//Save Examination
+		newExamination.setStatus(ExaminationStatus.ONGOING);
 		Examination savedExamination = examinationRepository.save(newExamination);
-		savedExamination.setStatus(ExaminationStatus.ONGOING);
 		
 		//To ExaminationDto
 		ExaminationDto examDto = modelMapper.map(savedExamination, ExaminationDto.class);
@@ -121,7 +126,7 @@ public class ExaminationServiceImpl implements ExaminationService {
 		return examDto;
 	}
 
-	private ExaminationSession checkIfSessionExists(String courseId) {
+	private ExaminationSession checkIfSession(String courseId) {
 		ExaminationSession session = sessionRepository.findCurrentExaminationSession(courseId);
 
 		if (session == null) {
@@ -155,7 +160,7 @@ public class ExaminationServiceImpl implements ExaminationService {
 		checkIfCourseExist(courseId);
 
 		// Get Current Exam Session
-		ExaminationSession session = checkIfSessionExists(courseId);
+		ExaminationSession session = checkIfSession(courseId);
 
 		// Get Student
 		Student student = checkIfStudentExist(studentId);
@@ -195,11 +200,27 @@ public class ExaminationServiceImpl implements ExaminationService {
 		}
 		
 	}
+	
+	private ExaminationSession checkIfSessionHasEnded(int sessionId) {
+		Optional<ExaminationSession> optional = sessionRepository.findById(sessionId);
+
+		if (optional.isEmpty()) {
+			throw new NoExaminationSessionException("" + sessionId);
+		}
+		
+		ExaminationSession session = optional.get();
+		
+		if (!session.isSessionClosed()) {
+			throw new ResultNotAvailableException();
+		}
+		
+		return session;
+	}
 
 	@Override
 	public ExaminationResultDto checkResult(int sessionId, String studentId) {
 		// Get Session
-		ExaminationSession session = checkIfSessionExists("" + studentId);
+		ExaminationSession session = checkIfSessionHasEnded(sessionId);
 
 		// Get Student
 		Student student = checkIfStudentExist(studentId);
