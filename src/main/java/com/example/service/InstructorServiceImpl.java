@@ -107,9 +107,15 @@ public class InstructorServiceImpl implements InstructorService {
 	}
 	
 	@Override
-	public QuestionDto addANewQuestionForACourse(QuestionDto questionDto, String courseId) {
+	public QuestionDto addANewQuestionForACourse(QuestionDto questionDto, String courseId, String instructorId) {
+		
+		Instructor instructor = checkIfInstructorExists(instructorId);
 		
 		Course course = checkIfCourseExists(courseId);
+		
+		if (!instructor.getCoursesTaken().contains(course)) {
+			throw new NoSuchCourseFoundException(courseId);
+		}
 		
 		Question question = modelMapper.map(questionDto, Question.class);
 		question.setQuestionId(PublicIdGeneratorUtils.generateId(30));
@@ -126,7 +132,15 @@ public class InstructorServiceImpl implements InstructorService {
 	}
 
 	@Override
-	public QuestionDto updateAQuestionForACourse(QuestionDto questionDto, String questionId) {
+	public QuestionDto updateAQuestionForACourse(QuestionDto questionDto, String courseId, String instructorId, String questionId) {
+		
+		Instructor instructor = checkIfInstructorExists(instructorId);
+		
+		Course course = checkIfCourseExists(courseId);
+		
+		if (!instructor.getCoursesTaken().contains(course)) {
+			throw new NoSuchCourseFoundException(courseId);
+		}
 		
 		Question formalQuestion = checkIfQuestionExists(questionId);
 		

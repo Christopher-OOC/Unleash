@@ -1,13 +1,14 @@
 package com.example.controller;
 
 import org.modelmapper.ModelMapper;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.model.dto.ExaminationDto;
@@ -19,6 +20,7 @@ import com.example.model.entity.ExaminationSession;
 import com.example.model.entity.Student;
 import com.example.model.responsemodel.ExaminationQuestionAnswerResponseModel;
 import com.example.model.responsemodel.ExaminationResponseModel;
+import com.example.model.responsemodel.ExaminationResultResponseModel;
 import com.example.model.responsemodel.RequestStatusType;
 import com.example.model.responsemodel.ResponseMessageModel;
 import com.example.model.responsemodel.ResponseStatusType;
@@ -60,6 +62,8 @@ public class ExaminationApiController {
 				ExaminationQuestionAnswerResponseModel.class);
 
 		response.setNextQuestion(responseNextQuestion);
+		
+		response.add(linkTo(methodOn(getClass()).submitPrevoiusAndGetNextQuestion(studentId, courseId, null)).withRel("next_question"));
 
 		return ResponseEntity.ok(response);
 	}
@@ -79,6 +83,7 @@ public class ExaminationApiController {
 
 	@GetMapping("/{studentId}/{courseId}/next_question")
 	public ResponseEntity<?> submitPrevoiusAndGetNextQuestion(@PathVariable("studentId") String studentId,
+			@PathVariable("courseId") String courseId,
 			@RequestBody ExaminationResponseModel examInRequest) {
 
 		ExaminationDto examDtoRequest = modelMapper.map(examInRequest, ExaminationDto.class);
@@ -99,7 +104,7 @@ public class ExaminationApiController {
 
 		examDtoRequest.setExaminationId(id);
 
-		ExaminationDto submittedExaminationDto = examinationService.submitPrevoiusQuestion(examDtoRequest);
+		examinationService.submitPrevoiusQuestion(examDtoRequest);
 
 		ExaminationQuestionAnswerDto nextQuestionDto = examinationService.getNextQuestion(examInRequest.getSessionId(),
 				examInRequest.getStudentId());
@@ -111,14 +116,16 @@ public class ExaminationApiController {
 		return ResponseEntity.ok(examInRequest);
 	}
 
-	@GetMapping("{studentId}/{courseId}/{sesionId}/results")
+	@GetMapping("/{studentId}/{courseId}/{sessionId}/results")
 	public ResponseEntity<?> checkResult(@PathVariable("studentId") String studentId,
 			@PathVariable("courseId") String courseId,
 			@PathVariable("sessionId") int sessionId) {
 		
 		ExaminationResultDto resultDto = examinationService.checkResult(sessionId, studentId);
+		
+		ExaminationResultResponseModel response = modelMapper.map(resultDto, ExaminationResultResponseModel.class);
 
-		return ResponseEntity.ok(resultDto);
+		return ResponseEntity.ok(response);
 	}
 
 }

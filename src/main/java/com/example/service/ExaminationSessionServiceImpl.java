@@ -4,13 +4,18 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.example.exceptions.BadRequestException;
 import com.example.exceptions.ExaminationSessionAlreadyCreated;
+import com.example.exceptions.NoExaminationSessionException;
 import com.example.exceptions.NoSuchCourseFoundException;
+import com.example.exceptions.NoSuchInstructorException;
 import com.example.model.dto.ExaminationSessionDto;
 import com.example.model.entity.Course;
 import com.example.model.entity.ExaminationSession;
+import com.example.model.entity.Instructor;
 import com.example.repository.CourseRepository;
 import com.example.repository.ExaminationSessionRepository;
+import com.example.repository.InstructorRepository;
 
 @Service
 public class ExaminationSessionServiceImpl implements ExaminationSessionService {
@@ -19,18 +24,27 @@ public class ExaminationSessionServiceImpl implements ExaminationSessionService 
 	
 	private ExaminationSessionRepository examinationSessionRepository;
 	
-	
+	private InstructorRepository instructorRepository;
 
-	public ExaminationSessionServiceImpl(CourseRepository courseRepository, ExaminationSessionRepository examinationSessionRepository) {
+	public ExaminationSessionServiceImpl(CourseRepository courseRepository,
+			InstructorRepository instructorRepository,
+			ExaminationSessionRepository examinationSessionRepository) {
 		super();
 		this.courseRepository = courseRepository;
 		this.examinationSessionRepository = examinationSessionRepository;
+		this.instructorRepository = instructorRepository;
 	}
 
 	@Override
-	public void createExamSessionForACourse(String courseId, ExaminationSessionDto dto) {
+	public void createExamSessionForACourse(String instructorId, String courseId, ExaminationSessionDto dto) {
+		
+		Instructor instructor = checkIfInstructorExists(instructorId);
 		
 		Course course = checkIfCourseExists(courseId);
+		
+		if (!instructor.getCoursesTaken().contains(course)) {
+			throw new BadRequestException("You cannot perform this operation because you don't teach this course");
+		}
 		
 		// check if no current exam session
 		
@@ -50,6 +64,16 @@ public class ExaminationSessionServiceImpl implements ExaminationSessionService 
 		}
 		
 	}
+	
+	private Instructor checkIfInstructorExists(String instructorId) {
+		Optional<Instructor> optional = instructorRepository.findByInstructorId(instructorId);
+		
+		if (optional.isEmpty()) {
+			throw new NoSuchInstructorException(instructorId);
+		}
+		
+		return optional.get();
+	}
 
 	private Course checkIfCourseExists(String courseId) {
 		Optional<Course> optional = courseRepository.findByCourseId(courseId);
@@ -64,9 +88,25 @@ public class ExaminationSessionServiceImpl implements ExaminationSessionService 
 	}
 
 	@Override
-	public ExaminationSession closeExamSessionForACourse(int courseId) {
-		// TODO Auto-generated method stub
-		return null;
+	public void closeExamSessionForACourse(String instructorId, String courseId) {
+		
+		Instructor instructor = checkIfInstructorExists(instructorId);
+		
+		Course course = checkIfCourseExists(courseId);
+		
+		if (!instructor.getCoursesTaken().contains(course)) {
+			throw new BadRequestException("You cannot perform this operation because you don't teach this course");
+		}
+		
+		ExaminationSession currentSession = examinationSessionRepository.findCurrentExaminationSession(courseId);
+		
+		if (currentSession == null) {
+			throw new NoExaminationSessionException(courseId);
+		}
+		
+		currentSession.setSessionClosed(true);
+		
+		examinationSessionRepository.save(currentSession);
 	}
 
 	@Override

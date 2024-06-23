@@ -1,4 +1,4 @@
-package com.example.model.dto;
+package com.example.model.responsemodel;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -10,9 +10,10 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class ExaminationResultDto {
+public class ExaminationResultResponseModel {
 	
-	private List<ExaminationQuestionAnswerDto> examinationQuestions = new ArrayList<>();
+	
+	private List<ExaminationQuestionAnswerResponseModel> examinationQuestions = new ArrayList<>();
 	
 	private int numberOfCorrectAnswer;
 	
@@ -23,8 +24,11 @@ public class ExaminationResultDto {
 	private Date startTime;
 	
 	private Date endTime;
-	
-	
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(endTime, numberOfCorrectAnswer, startTime);
+	}
 
 	@Override
 	public boolean equals(Object obj) {
@@ -34,15 +38,8 @@ public class ExaminationResultDto {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		ExaminationResultDto other = (ExaminationResultDto) obj;
+		ExaminationResultResponseModel other = (ExaminationResultResponseModel) obj;
 		return Objects.equals(endTime, other.endTime) && numberOfCorrectAnswer == other.numberOfCorrectAnswer
 				&& Objects.equals(startTime, other.startTime);
 	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(endTime, numberOfCorrectAnswer, startTime);
-	}
-
-	
 }

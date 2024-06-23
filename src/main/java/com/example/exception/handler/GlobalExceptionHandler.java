@@ -18,7 +18,9 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import com.example.exceptions.AlreadyEnrolledForTheCourseException;
 import com.example.exceptions.BadRequestException;
+import com.example.exceptions.ExaminationCompletionException;
 import com.example.exceptions.ExaminationNoLongerAvailableException;
 import com.example.exceptions.ExaminationSessionAlreadyCreated;
 import com.example.exceptions.NoCourseAvailableException;
@@ -30,7 +32,9 @@ import com.example.exceptions.NoSuchInstructorException;
 import com.example.exceptions.NoSuchQuestionFoundException;
 import com.example.exceptions.NoSuchStudentFoundException;
 import com.example.exceptions.NotRegisteredForTheCourseException;
+import com.example.exceptions.OngoingExaminationException;
 import com.example.exceptions.PasswordNotTheSameException;
+import com.example.exceptions.ResultNotAvailableException;
 import com.example.model.dto.ErrorDto;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -206,12 +210,75 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		return error;
 
 	}
-	
+
 	@ExceptionHandler(ExaminationNoLongerAvailableException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ResponseBody
 	public ErrorDto handleExaminationNoLongerAvailableException(HttpServletRequest request,
 			ExaminationNoLongerAvailableException ex) {
+
+		ErrorDto error = new ErrorDto();
+
+		error.setStatus(HttpStatus.BAD_REQUEST.value());
+		error.setPath(request.getServletPath());
+		error.getMessages().add(ex.getMessage());
+
+		return error;
+	}
+
+	@ExceptionHandler(ExaminationCompletionException.class)
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	@ResponseBody
+	public ErrorDto handleExaminationCompletionException(HttpServletRequest request,
+			ExaminationCompletionException ex) {
+
+		ErrorDto error = new ErrorDto();
+
+		error.setStatus(HttpStatus.NO_CONTENT.value());
+		error.setPath(request.getServletPath());
+		System.out.println(ex.getMessage());
+		error.getMessages().add(ex.getMessage());
+
+		return error;
+	}
+	
+	@ExceptionHandler(ResultNotAvailableException.class)
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	@ResponseBody
+	public ErrorDto handleResultNotAvailableException(HttpServletRequest request,
+			ResultNotAvailableException ex) {
+
+		ErrorDto error = new ErrorDto();
+
+		error.setStatus(HttpStatus.NO_CONTENT.value());
+		error.setPath(request.getServletPath());
+		System.out.println(ex.getMessage());
+		error.getMessages().add(ex.getMessage());
+
+		return error;
+	}
+	
+	@ExceptionHandler(OngoingExaminationException.class)
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	@ResponseBody
+	public ErrorDto handleOngoingExaminationException(HttpServletRequest request,
+			OngoingExaminationException ex) {
+
+		ErrorDto error = new ErrorDto();
+
+		error.setStatus(HttpStatus.NO_CONTENT.value());
+		error.setPath(request.getServletPath());
+		System.out.println(ex.getMessage());
+		error.getMessages().add(ex.getMessage());
+
+		return error;
+	}
+
+	@ExceptionHandler(AlreadyEnrolledForTheCourseException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ResponseBody
+	public ErrorDto handleAlreadyEnrolledForTheCourseException(HttpServletRequest request,
+			AlreadyEnrolledForTheCourseException ex) {
 
 		ErrorDto error = new ErrorDto();
 

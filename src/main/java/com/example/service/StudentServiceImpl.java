@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.example.exceptions.AlreadyEnrolledForTheCourseException;
 import com.example.exceptions.NoCourseAvailableException;
 import com.example.exceptions.NoSuchCourseFoundException;
 import com.example.exceptions.NoSuchStudentFoundException;
@@ -115,10 +116,14 @@ public class StudentServiceImpl implements StudentService {
 	@Override
 	public void enrollForACourse(String studentId, String courseId) {
 		StudentDto studentDto = checkIfStudentExist(studentId);
+		
+		CourseDto courseDto = checkIfCourseExist(courseId);
+		
+		if (studentDto.getCoursesTaken().contains(courseDto)) {
+			 throw new AlreadyEnrolledForTheCourseException(courseId);
+		}
 
 		Student student = modelMapper.map(studentDto, Student.class);
-
-		CourseDto courseDto = checkIfCourseExist(courseId);
 
 		Course course = modelMapper.map(courseDto, Course.class);
 

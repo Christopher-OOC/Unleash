@@ -5,5 +5,6 @@ public enum RequestStatusType {
 	DELETED,
 	UPDATED,
 	UPLOADED,
-	ENDED
+	ENDED,
+	CLOSED
 }

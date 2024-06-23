@@ -13,9 +13,9 @@ public interface InstructorService {
 
 	void save(InstructorDto instructorDto);
 	
-	QuestionDto addANewQuestionForACourse(QuestionDto questionDto, String courseId);
+	QuestionDto addANewQuestionForACourse(QuestionDto questionDto, String courseId, String instructorId);
 	
-	QuestionDto updateAQuestionForACourse(QuestionDto questionDto, String questionId);
+	QuestionDto updateAQuestionForACourse(QuestionDto questionDto, String courseId, String instructorId,  String questionId);
 	
 	
 

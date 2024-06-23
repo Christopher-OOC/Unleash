@@ -159,19 +159,34 @@ public class InstructorApiController {
 
 	}
 
-	@PostMapping("/{courseId}/exam-session")
+	@PostMapping("/{instructorId}/{courseId}/start-session")
 	public ResponseEntity<?> createAnExaminaionSession(@RequestBody @Valid ExaminationSessionRequestModel requestModel,
+			@PathVariable("instructotId") String instructorId,
 			@PathVariable("courseId") String courseId) {
 
 		ExaminationSessionDto dto = modelMapper.map(requestModel, ExaminationSessionDto.class);
 
-		examinationSessionService.createExamSessionForACourse(courseId, dto);
+		examinationSessionService.createExamSessionForACourse(instructorId, courseId, dto);
 
 		ResponseMessageModel message = new ResponseMessageModel();
 		message.setResponseStatusType(ResponseStatusType.SUCCESS);
 		message.setRequestStatusType(RequestStatusType.CREATED);
 
 		return ResponseEntity.created(null).body(message);
+	}
+	
+	@PostMapping("/{instructorId}/{courseId}/end-session")
+	public ResponseEntity<?> endAnExaminaionSession(
+			@PathVariable("instructorId") String instructorId,
+			@PathVariable("courseId") String courseId) {
+
+		examinationSessionService.closeExamSessionForACourse(instructorId, courseId);
+
+		ResponseMessageModel message = new ResponseMessageModel();
+		message.setResponseStatusType(ResponseStatusType.SUCCESS);
+		message.setRequestStatusType(RequestStatusType.CLOSED);
+
+		return ResponseEntity.ok(message);
 	}
 
 	@PostMapping("/{instructorId}/{courseId}/questions")
@@ -180,7 +195,7 @@ public class InstructorApiController {
 
 		QuestionDto questionDto = modelMapper.map(requestModel, QuestionDto.class);
 
-		QuestionDto savedQuestion = instructorService.addANewQuestionForACourse(questionDto, courseId);
+		QuestionDto savedQuestion = instructorService.addANewQuestionForACourse(questionDto, courseId, instructorId);
 
 		QuestionResponseModel response = modelMapper.map(savedQuestion, QuestionResponseModel.class);
 
@@ -189,11 +204,13 @@ public class InstructorApiController {
 
 	@PatchMapping("/{instructorId}/{courseId}/questions")
 	public ResponseEntity<?> updateAQuestionForACourse(@RequestBody @Valid QuestionRequestModel requestModel,
-			@PathVariable("instructorId") String instructorId, @PathVariable("questionId") String questionId) {
+			@PathVariable("courseId") String courseId,
+			@PathVariable("instructorId") String instructorId,
+			@PathVariable("questionId") String questionId) {
 
 		QuestionDto questionDto = modelMapper.map(requestModel, QuestionDto.class);
 
-		QuestionDto updatedQuestion = instructorService.updateAQuestionForACourse(questionDto, questionId);
+		QuestionDto updatedQuestion = instructorService.updateAQuestionForACourse(questionDto, courseId, instructorId, questionId);
 
 		QuestionResponseModel response = modelMapper.map(updatedQuestion, QuestionResponseModel.class);
 

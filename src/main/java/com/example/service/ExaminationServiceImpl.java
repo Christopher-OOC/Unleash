@@ -11,7 +11,10 @@ import org.springframework.stereotype.Service;
 import com.example.exceptions.NoSuchCourseFoundException;
 import com.example.exceptions.NoSuchStudentFoundException;
 import com.example.exceptions.NotRegisteredForTheCourseException;
+import com.example.exceptions.OngoingExaminationException;
 import com.example.exceptions.ResultNotAvailableException;
+import com.example.exceptions.ExaminationCompletionException;
+import com.example.exceptions.ExaminationHasEndedException;
 import com.example.exceptions.ExaminationNoLongerAvailableException;
 import com.example.exceptions.NoExaminationSessionException;
 import com.example.exceptions.NoOngoingExaminationException;
@@ -192,12 +195,28 @@ public class ExaminationServiceImpl implements ExaminationService {
 		
 		Examination examination = optionalExamination.get();
 
-		if (examination.getStatus() == ExaminationStatus.ONGOING) {
-			return examination;
+		if (examination.getStatus() != ExaminationStatus.ONGOING) {
+			throw new ExaminationHasEndedException("The examination has ended");
 		}
-		else {
-			throw new RuntimeException("The examination has ended");
+		
+		return examination;
+		
+	}
+	
+	private Examination checkIfExaminationHasEnded(String studentId, ExaminationId id) {
+		Optional<Examination> optionalExamination = examinationRepository.findById(id);
+
+		if (optionalExamination.isEmpty()) {
+			throw new NoOngoingExaminationException(studentId);
 		}
+		
+		Examination examination = optionalExamination.get();
+
+		if (examination.getStatus() != ExaminationStatus.ENDED) {
+			throw new OngoingExaminationException("The examination is ongoing");
+		}
+		
+		return examination;
 		
 	}
 	
@@ -231,7 +250,7 @@ public class ExaminationServiceImpl implements ExaminationService {
 		examId.setStudentId(student);
 
 		// Get the Required Examination
-		Examination exam = checkIfExaminationOngoing(studentId, examId);
+		Examination exam = checkIfExaminationHasEnded(studentId, examId);
 
 		// Bind Examination to ExaminationResultDto
 		ExaminationResultDto resultDto = modelMapper.map(exam, ExaminationResultDto.class);
@@ -324,6 +343,10 @@ public class ExaminationServiceImpl implements ExaminationService {
 	public ExaminationQuestionAnswerDto getNextQuestion(int sessionId, String studentId) {
 		
 		ExaminationQuestionAnswer nextQuestion = questionAnswerRepository.findExaminationNextQuestion(sessionId, studentId);
+		
+		if (nextQuestion == null) {
+			throw new ExaminationCompletionException();
+		}
 		
 		ExaminationQuestionAnswerDto nextQuestionDto = modelMapper.map(nextQuestion, ExaminationQuestionAnswerDto.class);
 		

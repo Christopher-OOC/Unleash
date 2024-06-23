@@ -71,7 +71,10 @@ public class Instructor {
 	public int hashCode() {
 		return Objects.hash(instructorId);
 	}
-	
-	
 
+	@Override
+	public String toString() {
+		return "Instructor [id=" + id + ", instructorId=" + instructorId + ", fullName=" + fullName + ", email=" + email
+				+ ", password=" + password + ", dateRegistered=" + dateRegistered + "]";
+	}
 }

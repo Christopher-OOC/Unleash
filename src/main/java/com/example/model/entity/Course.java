@@ -88,7 +88,7 @@ public class Course {
 	@Override
 	public String toString() {
 		return "Course [courseId=" + courseId + ", courseCode=" + courseCode + ", courseName=" + courseName
-				+ ", studentEnrolled=" + studentEnrolled + ", dateCreated=" + dateCreated + "]";
+				+ ", dateCreated=" + dateCreated + "]";
 	}
 	
 	
