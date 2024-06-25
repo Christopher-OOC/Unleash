@@ -1,5 +1,9 @@
 package com.example.service;
 
-public interface UserService {
+import com.example.model.entity.User;
 
+public interface UserService {
+	
+	User findUserByEmail(String email);
+	
 }
