@@ -38,6 +38,10 @@ public class Role {
 	)
 	private Collection<Authority> authorities;
 
+	public Role(String name) {
+		this.name = name;
+	}
+	
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)

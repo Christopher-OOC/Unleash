@@ -34,7 +34,7 @@ public class User {
 	private String password;
 	
 	//6 Digits Pin
-	@Column(nullable=false, length=6)
+	@Column(nullable=false)
 	private String pin;
 	
 	private String emailVerificationToken;

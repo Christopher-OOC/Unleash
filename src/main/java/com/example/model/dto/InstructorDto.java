@@ -25,6 +25,8 @@ public class InstructorDto {
 	
 	private String password;
 	
+	private String pin;
+	
 	private List<Course> coursesTaken = new ArrayList<>();
 	
 	private Date dateRegistered;

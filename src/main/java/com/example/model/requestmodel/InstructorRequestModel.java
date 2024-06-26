@@ -36,6 +36,8 @@ public class InstructorRequestModel {
 	@Length(min=8, max=20, message="Confirm password must have between 8-20 characters")
 	private String confirmPassword;
 	
+	private String pin;
+	
 
 	@Override
 	public boolean equals(Object obj) {

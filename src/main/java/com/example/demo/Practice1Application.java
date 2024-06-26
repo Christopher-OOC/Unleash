@@ -13,6 +13,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @ComponentScan(value="com.example.service")
 @ComponentScan(value="com.example.utilities")
 @ComponentScan(value="com.example.config")
+@ComponentScan(value="com.example.security")
 
 @SpringBootApplication
 public class Practice1Application {

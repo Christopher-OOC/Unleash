@@ -11,6 +11,10 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.encrypt.Encryptors;
+import org.springframework.security.crypto.encrypt.TextEncryptor;
+import org.springframework.security.crypto.keygen.KeyGenerators;
 import org.springframework.stereotype.Service;
 
 import com.example.exceptions.NoCourseAvailableException;
@@ -23,10 +27,12 @@ import com.example.model.dto.QuestionDto;
 import com.example.model.entity.Course;
 import com.example.model.entity.Instructor;
 import com.example.model.entity.Question;
+import com.example.model.entity.User;
 import com.example.repository.CourseRepository;
 import com.example.repository.InstructorRepository;
 import com.example.repository.QuestionRepository;
 import com.example.utilities.PublicIdGeneratorUtils;
+import com.example.utilities.TokenGenerators;
 
 @Service
 public class InstructorServiceImpl implements InstructorService {
@@ -36,25 +42,46 @@ public class InstructorServiceImpl implements InstructorService {
 	private InstructorRepository instructorRepository;
 	
 	private QuestionRepository questionRepository;
+	
+	private BCryptPasswordEncoder passwordEncoder;
 
 	private ModelMapper modelMapper;
+	
 	
 	private Map<String, Object> propertyMap = Map.of("course_code", "courseCode", "course_name", "courseName",
 			"date_created", "dateCreated");
 
 
 	public InstructorServiceImpl(CourseRepository courseRepository, InstructorRepository instructorRepository,
-			QuestionRepository questionRepository, ModelMapper modelMapper) {
+			QuestionRepository questionRepository, BCryptPasswordEncoder passwordEncoder, ModelMapper modelMapper) {
 		super();
 		this.courseRepository = courseRepository;
 		this.instructorRepository = instructorRepository;
 		this.questionRepository = questionRepository;
+		this.passwordEncoder = passwordEncoder;
 		this.modelMapper = modelMapper;
 	}
 
 	@Override
 	public void save(InstructorDto instructorDto) {
 		Instructor instructor = modelMapper.map(instructorDto, Instructor.class);
+		
+		User userInstructor = new User();
+		userInstructor.setEmail(instructor.getEmail());
+		userInstructor.setEmailVerificationStatus(false);
+		userInstructor.setEmailVerificationToken(TokenGenerators.generateEmailVerificationToken(instructor.getEmail()));
+		userInstructor.setPassword(passwordEncoder.encode(instructor.getPassword()));
+		userInstructor.setPasswordResetToken(null);
+		
+		String salt = KeyGenerators.string().generateKey();
+		String secret = "christopher";
+		
+		TextEncryptor encryptor = Encryptors.text(secret, salt);
+		
+		
+		
+		userInstructor.setPin(encryptor.encrypt(instructorDto.getPin()));
+		userInstructor.setRoles(null);
 
 		instructorRepository.save(instructor);
 	}
