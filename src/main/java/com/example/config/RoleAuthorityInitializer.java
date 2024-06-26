@@ -17,6 +17,7 @@ import com.example.model.entity.User;
 import com.example.repository.AuthorityRepository;
 import com.example.repository.RoleRepository;
 import com.example.repository.UserRepository;
+import com.example.utilities.PinEncoderUtils;
 
 import java.util.Arrays;
 
@@ -84,14 +85,8 @@ public class RoleAuthorityInitializer {
 			superAdmin.setEmailVerificationStatus(true);
 			superAdmin.setEmailVerificationToken(null);
 			superAdmin.setPassword("christopher");
-			superAdmin.setPasswordResetToken(null);
-			
-			String salt = KeyGenerators.string().generateKey();
-			String secret = "christopher";
-			TextEncryptor encryptor = Encryptors.text(secret, salt);
-			String encryptedPin = encryptor.encrypt("123456");
-			
-			superAdmin.setPin(encryptedPin);
+			superAdmin.setPasswordResetToken(null);	
+			superAdmin.setPin(PinEncoderUtils.encodePin("12345"));
 			superAdmin.setRoles(Arrays.asList(superAdminRole));
 			
 			userRepository.save(superAdmin);
