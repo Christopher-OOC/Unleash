@@ -3,6 +3,7 @@ package com.example.service;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Arrays;
 
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -21,9 +22,16 @@ import com.example.exceptions.ResourceNotFoundException;
 import com.example.model.dto.CourseDto;
 import com.example.model.dto.StudentDto;
 import com.example.model.entity.Course;
+import com.example.model.entity.Role;
 import com.example.model.entity.Student;
+import com.example.model.entity.User;
+import com.example.model.entity.UserType;
 import com.example.repository.CourseRepository;
+import com.example.repository.RoleRepository;
 import com.example.repository.StudentRepository;
+import com.example.repository.UserRepository;
+import com.example.utilities.PublicIdGeneratorUtils;
+import com.example.utilities.Roles;
 
 @Service
 public class StudentServiceImpl implements StudentService {
@@ -31,6 +39,10 @@ public class StudentServiceImpl implements StudentService {
 	private StudentRepository studentRepository;
 
 	private CourseRepository courseRepository;
+	
+	private RoleRepository roleRepository;
+	
+	private UserRepository userRepository;
 
 	private ModelMapper modelMapper;
 
@@ -40,15 +52,33 @@ public class StudentServiceImpl implements StudentService {
 	private Map<String, String> propertyCourse = Map.of("course_name", "courseName", "course_code", "courseCode");
 
 	public StudentServiceImpl(StudentRepository studentRepository, CourseRepository courseRepository,
-			ModelMapper modelMapper) {
+			RoleRepository roleRepository, UserRepository userRepository, ModelMapper modelMapper) {
 		super();
 		this.studentRepository = studentRepository;
 		this.courseRepository = courseRepository;
+		this.roleRepository = roleRepository;
+		this.userRepository = userRepository;
 		this.modelMapper = modelMapper;
 	}
 
 	@Override
 	public void register(StudentDto dto) {
+		
+		User user = new User();
+		user.setEmail(dto.getEmail());
+		user.setEmailVerificationStatus(false);
+		user.setEmailVerificationToken(null);
+		user.setPassword(dto.getPassword());
+		user.setPasswordResetToken(null);
+		user.setUserType(UserType.STUDENT);
+		user.setPin("123456");
+		
+		Optional<Role> optionalRole = roleRepository.findByName(Roles.ROLE_STUDENT.name());
+		user.setRoles(Arrays.asList(optionalRole.get()));
+		
+		userRepository.save(user);
+		
+		dto.setStudentId(PublicIdGeneratorUtils.generateId(30));
 		Student student = modelMapper.map(dto, Student.class);
 
 		studentRepository.save(student);

@@ -64,12 +64,8 @@ public class StudentApiController {
 	@PostMapping
 	public ResponseEntity<?> register(@RequestBody @Valid StudentRequestModel requestModel) {
 		
-		System.out.println("CHRISTOPHER: ");
-		
 		StudentDto dto = modelMapper.map(requestModel, StudentDto.class);
-
-		dto.setStudentId(PublicIdGeneratorUtils.generateId(30));
-
+		
 		studentService.register(dto);
 
 		ResponseMessageModel message = new ResponseMessageModel();
