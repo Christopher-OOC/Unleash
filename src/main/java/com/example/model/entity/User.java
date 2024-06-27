@@ -1,9 +1,10 @@
 package com.example.model.entity;
 
-import java.util.Collection;
+import java.util.ArrayList;
+
+import java.util.List;
 import java.util.Objects;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -43,12 +44,12 @@ public class User {
 	
 	private String passwordResetToken;
 	
-	@ManyToMany(cascade=CascadeType.PERSIST, fetch=FetchType.EAGER)
+	@ManyToMany(fetch=FetchType.EAGER)
 	@JoinTable(name="users_roles", 
 		joinColumns=@JoinColumn(name="users_id", referencedColumnName="id"),
 		inverseJoinColumns=@JoinColumn(name="roles_id", referencedColumnName="id")
 	)
-	private Collection<Role> roles;
+	private List<Role> roles = new ArrayList<>();;
 
 	@Override
 	public boolean equals(Object obj) {

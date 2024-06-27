@@ -1,9 +1,10 @@
 package com.example.model.entity;
 
-import java.util.Collection;
+import java.util.ArrayList;
+
+import java.util.List;
 import java.util.Objects;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -29,14 +30,14 @@ public class Role {
 	private String name;
 	
 	@ManyToMany(mappedBy="roles", fetch=FetchType.LAZY)
-	Collection<User> users;
+	List<User> users = new ArrayList<>();
 	
-	@ManyToMany(cascade=CascadeType.PERSIST, fetch=FetchType.EAGER)
+	@ManyToMany(fetch=FetchType.EAGER)
 	@JoinTable(name="roles_authorities",
 		joinColumns=@JoinColumn(name="roles_id", referencedColumnName="id"),
 		inverseJoinColumns=@JoinColumn(name="authorities_id", referencedColumnName="id")
 	)
-	private Collection<Authority> authorities;
+	private List<Authority> authorities = new ArrayList<>();
 
 	public Role(String name) {
 		this.name = name;

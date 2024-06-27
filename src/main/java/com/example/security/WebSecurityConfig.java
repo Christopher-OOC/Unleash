@@ -41,11 +41,12 @@ public class WebSecurityConfig {
 			
 			return null;
 		};
-		
 	}
 	
+
 	@Bean
 	protected AuthenticationManager getAuthenticationManager(HttpSecurity http) throws Exception {
+		
 		
 		AuthenticationManagerBuilder builder = http.getSharedObject(AuthenticationManagerBuilder.class);
 		

@@ -1,8 +1,10 @@
 package com.example.model.entity;
 
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -25,7 +27,7 @@ public class Authority {
 	private String name;
 	
 	@ManyToMany(mappedBy="authorities")
-	Collection<Role> roles;
+	List<Role> roles = new ArrayList<>();;
 	
 	public Authority(String name) {
 		this.name = name;

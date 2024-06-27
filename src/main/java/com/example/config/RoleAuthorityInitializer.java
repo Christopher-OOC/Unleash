@@ -1,14 +1,11 @@
 package com.example.config;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
-import org.springframework.security.crypto.encrypt.Encryptors;
-import org.springframework.security.crypto.encrypt.TextEncryptor;
-import org.springframework.security.crypto.keygen.KeyGenerators;
 import org.springframework.stereotype.Component;
 
 import com.example.model.entity.Authority;
@@ -78,6 +75,7 @@ public class RoleAuthorityInitializer {
 		
 		Optional<User> optional = userRepository.findByEmail(SUPER_ADMIN_EMAIL);
 		
+		
 		if (optional.isEmpty()) {
 			
 			User superAdmin = new User();
@@ -87,7 +85,8 @@ public class RoleAuthorityInitializer {
 			superAdmin.setPassword("christopher");
 			superAdmin.setPasswordResetToken(null);	
 			superAdmin.setPin(PinEncoderUtils.encodePin("12345"));
-			superAdmin.setRoles(Arrays.asList(superAdminRole));
+			
+			superAdmin.getRoles().add(superAdminRole);
 			
 			userRepository.save(superAdmin);
 		}
@@ -103,23 +102,27 @@ public class RoleAuthorityInitializer {
 			return authorityRepository.save(authority);
 		}
 		else {
-			return null;
+			return optional.get();
 		}
 	}
 
-	private Role createRole(String name, Collection<Authority> authorities) {
+	private Role createRole(String name, List<Authority> authorities) {
 		
 		Optional<Role> optional = roleRepository.findByName(name);
 		
 		if (optional.isEmpty()) {
 			Role role = new Role(name);
-			role.setAuthorities(authorities);
+			
+			for (Authority authority : authorities) {
+				authority.getRoles().add(role);
+				role.getAuthorities().add(authority);
+			}
 			
 			return roleRepository.save(role);
 		}
 		else {
 			
-			return null;
+			return optional.get();
 		}
 	}
 }
