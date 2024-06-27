@@ -204,4 +204,19 @@ public class InstructorServiceImpl implements InstructorService {
 		
 		return optional.get();
 	}
+
+	@Override
+	public InstructorDto getInstructorByEmail(String email) {
+		Optional<Instructor> optional = instructorRepository.findByEmail(email);
+		
+		if (optional.isEmpty()) {
+			throw new InstructorNotFoundException(email);
+		}
+		
+		Instructor instructor = optional.get();
+		
+		
+		
+		return modelMapper.map(instructor, InstructorDto.class);
+	}
 }

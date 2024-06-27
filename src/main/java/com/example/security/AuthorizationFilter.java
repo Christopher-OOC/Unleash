@@ -5,12 +5,17 @@ import java.io.IOException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Controller;
 
+import io.jsonwebtoken.JwtParser;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.Jwts.SIG;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
 @Component
 public class AuthorizationFilter extends BasicAuthenticationFilter {
@@ -22,6 +27,21 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
+		
+		String authorizationHeader = request.getHeader("Authorization");
+		
+		if (authorizationHeader == null) {
+			chain.doFilter(request, response);
+		}
+		
+		String signingKey = "";
+		
+		SecretKey secret = new SecretKeySpec(signingKey.getBytes(), SIG.HS512.toString());
+		
+		JwtParser jwtParser = Jwts.parser()
+			.setSigningKey(secret)
+			.build();
+			
 		
 		
 	}

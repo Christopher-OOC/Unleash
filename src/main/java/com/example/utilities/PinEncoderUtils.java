@@ -1,6 +1,7 @@
 package com.example.utilities;
 
 import org.springframework.security.crypto.encrypt.Encryptors;
+
 import org.springframework.security.crypto.encrypt.TextEncryptor;
 import org.springframework.security.crypto.keygen.KeyGenerators;
 

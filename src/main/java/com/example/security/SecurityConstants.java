@@ -10,4 +10,12 @@ public class SecurityConstants {
 	
 	public static final String PASSWORD_RESET_URL = "/password-reset";
 	
+	public static final String AUTHORIZATION_HEADER_NAME = "Authorization";
+	
+	public static final String AUTHORIZATION_HEADER_PREFIX = "Bearer ";
+	
+	public static final String TOKEN_SIGINING_SECRET = "poSuyrFD2hjDmnGFDn37G2n29j2GFkGlHl2HF3";
+	
+	public static final long TOKEN_EXPIRATION_TIME = 600000;
+	
 }

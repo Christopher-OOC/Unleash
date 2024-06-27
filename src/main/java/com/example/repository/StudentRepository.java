@@ -9,5 +9,7 @@ import com.example.model.entity.Student;
 public interface StudentRepository extends JpaRepository<Student, Integer>, FilterStudentRepository {
 	
 	Optional<Student> findByStudentId(String studentId);
+	
+	Optional<Student> findByEmail(String email);
 
 }

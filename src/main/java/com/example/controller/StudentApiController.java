@@ -63,6 +63,9 @@ public class StudentApiController {
 
 	@PostMapping
 	public ResponseEntity<?> register(@RequestBody @Valid StudentRequestModel requestModel) {
+		
+		System.out.println("CHRISTOPHER: ");
+		
 		StudentDto dto = modelMapper.map(requestModel, StudentDto.class);
 
 		dto.setStudentId(PublicIdGeneratorUtils.generateId(30));
@@ -204,7 +207,6 @@ public class StudentApiController {
 		}
 
 	}
-
 
 	private void validateSortFields(String sortOptions, Map<String, String> propertyMap) {
 		String[] arrSortFields = sortOptions.split(",");

@@ -58,6 +58,7 @@ public class WebSecurityConfig {
 		
 		 http
 			.authorizeHttpRequests(request -> request
+					//.requestMatchers("/**").permitAll()
 					.requestMatchers(HttpMethod.POST  ,SecurityConstants.SIGN_UP_URL).permitAll()
 					.requestMatchers(HttpMethod.GET, SecurityConstants.EMAIL_VERIFICATION_URL).permitAll()
 					.requestMatchers(HttpMethod.GET, SecurityConstants.PASSWORD_RESET_URL).permitAll()

@@ -17,6 +17,7 @@ import com.example.exceptions.AlreadyEnrolledForTheCourseException;
 import com.example.exceptions.NoCourseAvailableException;
 import com.example.exceptions.NoSuchCourseFoundException;
 import com.example.exceptions.NoSuchStudentFoundException;
+import com.example.exceptions.ResourceNotFoundException;
 import com.example.model.dto.CourseDto;
 import com.example.model.dto.StudentDto;
 import com.example.model.entity.Course;
@@ -159,5 +160,18 @@ public class StudentServiceImpl implements StudentService {
 		Page<CourseDto> dtoPage = new PageImpl<>(listDto, pageable, coursePage.getTotalElements());
 		
 		return dtoPage;
+	}
+
+	@Override
+	public StudentDto getStudentByEmail(String email) {
+		Optional<Student> optional = studentRepository.findByEmail(email);
+		
+		if (optional.isEmpty()) {
+			throw new ResourceNotFoundException();
+		}
+		
+		Student student = optional.get();
+		
+		return modelMapper.map(student, StudentDto.class);
 	}
 }

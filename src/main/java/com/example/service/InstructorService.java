@@ -17,6 +17,6 @@ public interface InstructorService {
 	
 	QuestionDto updateAQuestionForACourse(QuestionDto questionDto, String courseId, String instructorId,  String questionId);
 	
-	
+	InstructorDto getInstructorByEmail(String email);
 
 }

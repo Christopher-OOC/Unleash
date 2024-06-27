@@ -17,4 +17,6 @@ public interface StudentService {
 	
 	Page<CourseDto> getEnrolledCoursesForAStudent(String studentId, int pageNum, int pageSize, String sortOptions, String search);
 
+	StudentDto getStudentByEmail(String email);
+	
 }

@@ -243,7 +243,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	}
 	
 	@ExceptionHandler(ResultNotAvailableException.class)
-	@ResponseStatus(HttpStatus.NO_CONTENT)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ResponseBody
 	public ErrorDto handleResultNotAvailableException(HttpServletRequest request,
 			ResultNotAvailableException ex) {

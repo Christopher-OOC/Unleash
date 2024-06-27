@@ -86,6 +86,8 @@ public class InstructorApiController {
 		instructorDto.setInstructorId(PublicIdGeneratorUtils.generateId(30));
 
 		instructorService.save(instructorDto);
+		
+		System.out.println("HERE IN");
 
 		URI uri = URI.create("/v1/instructors/" + instructorDto.getInstructorId());
 
@@ -161,7 +163,7 @@ public class InstructorApiController {
 
 	@PostMapping("/{instructorId}/{courseId}/start-session")
 	public ResponseEntity<?> createAnExaminaionSession(@RequestBody @Valid ExaminationSessionRequestModel requestModel,
-			@PathVariable("instructotId") String instructorId,
+			@PathVariable("instructorId") String instructorId,
 			@PathVariable("courseId") String courseId) {
 
 		ExaminationSessionDto dto = modelMapper.map(requestModel, ExaminationSessionDto.class);
