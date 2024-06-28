@@ -79,7 +79,7 @@ public class WebSecurityConfig {
 		authenticationFilter.setPasswordParameter("passowrd");
 		authenticationFilter.setFilterProcessesUrl(SecurityConstants.LOGIN_URL);
 		
-		AuthorizationFilter authorizationFilter = new AuthorizationFilter(getAuthenticationManager(http));
+		AuthorizationFilter authorizationFilter = new AuthorizationFilter(getAuthenticationManager(http), userRepository);
 		
 		http.addFilter(authenticationFilter);
 		http.addFilter(authorizationFilter);
