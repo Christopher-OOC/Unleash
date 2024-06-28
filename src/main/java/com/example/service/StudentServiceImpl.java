@@ -77,7 +77,7 @@ public class StudentServiceImpl implements StudentService {
 		user.setPassword(passwordEncoder.encode(dto.getPassword()));
 		user.setPasswordResetToken(null);
 		user.setUserType(UserType.STUDENT);
-		user.setPin(PinEncoderUtils.encodePin("12345"));
+		user.setPin(PinEncoderUtils.encodePin(dto.getPin()));
 		
 		Optional<Role> optionalRole = roleRepository.findByName(Roles.ROLE_STUDENT.name());
 		user.setRoles(Arrays.asList(optionalRole.get()));

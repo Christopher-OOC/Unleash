@@ -20,12 +20,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class StudentRequestModel {
 	
-	@NotNull(message="First name cannot be null")
 	@NotBlank(message="First name cannot be empty")
 	@Length(min=2, max=20, message="First name must have between 2-20 characters")
 	private String firstName;
 	
-	@NotNull(message="Last name cannot be null")
 	@NotBlank(message="Last name cannot be empty")
 	@Length(min=2, max=20, message="Last name must have between 2-20 characters")
 	private String lastName;
@@ -35,17 +33,14 @@ public class StudentRequestModel {
 	@Length(min=2, max=20, message="Middle name must have between 2-20 characters")
 	private String middleName;
 	
-	@NotNull(message="Email cannot be null")
 	@NotBlank(message="Email cannot be empty")
 	@Email(message="Email provided must be a valid email")
 	private String email;
 	
-	@NotNull(message="Password cannot be null")
 	@NotBlank(message="Password cannot be empty")
 	@Length(min=8, max=20, message="Password must have between 8-20 characters")
 	private String password;
 	
-	@NotNull(message="Confirm Password cannot be null")
 	@NotBlank(message="Confirm Password cannot be empty")
 	@Length(min=8, max=20, message="Password must have between 8-20 characters")
 	private String confirmPassword;
@@ -53,6 +48,9 @@ public class StudentRequestModel {
 	@Past(message="Date of birth must be in the past")
 	@JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd")
 	private Date dateOfBirth;
+	
+	@NotBlank(message="Pin must be provided")
+	private String pin;
 
 	@Override
 	public boolean equals(Object obj) {
@@ -70,5 +68,4 @@ public class StudentRequestModel {
 	public int hashCode() {
 		return Objects.hash(email);
 	}
-
 }
