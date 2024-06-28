@@ -54,7 +54,7 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
 		chain.doFilter(request, response);
 	}
 
-	public UsernamePasswordAuthenticationToken getAuthentication(String token) {
+	private UsernamePasswordAuthenticationToken getAuthentication(String token) {
 		
 		String actualToken = token.replace(SecurityConstants.AUTHORIZATION_HEADER_PREFIX, "");
 
@@ -71,7 +71,8 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
 		
 		Date now = new Date();
 		
-		if (expiration.after(now)) {
+		if (expiration.before(now)) {
+			
 			return null;
 		}
 		
@@ -82,6 +83,7 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
 		Optional<User> optional = userRepository.findByEmail(email);
 		
 		if (optional.isEmpty()) {
+
 			return null;
 		}
 		

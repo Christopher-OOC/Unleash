@@ -1,6 +1,5 @@
 package com.example.security;
 
-import java.util.Collections;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,9 +41,7 @@ public class WebSecurityConfig {
 			
 			User userEntity = optional.get();
 			
-			var user = new org.springframework.security.core.userdetails.User(userEntity.getEmail(), userEntity.getPassword(), Collections.emptyList());
-			
-			return user;
+			return new UserPrincipal(userEntity);
 		};
 	}
 	
@@ -63,10 +60,10 @@ public class WebSecurityConfig {
 		
 		 http
 			.authorizeHttpRequests(request -> request
-					//.requestMatchers("/**").permitAll()
 					.requestMatchers(HttpMethod.POST  ,SecurityConstants.SIGN_UP_URL).permitAll()
 					.requestMatchers(HttpMethod.GET, SecurityConstants.EMAIL_VERIFICATION_URL).permitAll()
 					.requestMatchers(HttpMethod.GET, SecurityConstants.PASSWORD_RESET_URL).permitAll()
+					.anyRequest().authenticated()
 					);
 		
 		http.csrf(csrf -> csrf.disable());

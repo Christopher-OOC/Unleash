@@ -72,7 +72,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 		
 		Instant now = Instant.now();
 		
-		String email = ((org.springframework.security.core.userdetails.User) authResult.getPrincipal()).getUsername();
+		String email = ((UserPrincipal)authResult.getPrincipal()).getUsername();
 		
 		String userId = null;
 		
@@ -95,8 +95,6 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 			userId = studentDto.getStudentId();
 		}
 		
-		
-		
 		String token = Jwts
 			.builder()
 				.signWith(key, SignatureAlgorithm.HS512)
@@ -108,7 +106,4 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 		response.addHeader(SecurityConstants.AUTHORIZATION_HEADER_NAME, SecurityConstants.AUTHORIZATION_HEADER_PREFIX + token);
 		response.addHeader("userId", userId);
 	}
-	
-	
-
 }
