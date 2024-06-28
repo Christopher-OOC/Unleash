@@ -3,6 +3,7 @@ package com.example.service;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Arrays;
 
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -12,9 +13,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.encrypt.Encryptors;
-import org.springframework.security.crypto.encrypt.TextEncryptor;
-import org.springframework.security.crypto.keygen.KeyGenerators;
 import org.springframework.stereotype.Service;
 
 import com.example.exceptions.NoCourseAvailableException;
@@ -27,11 +25,16 @@ import com.example.model.dto.QuestionDto;
 import com.example.model.entity.Course;
 import com.example.model.entity.Instructor;
 import com.example.model.entity.Question;
+import com.example.model.entity.Role;
 import com.example.model.entity.User;
 import com.example.repository.CourseRepository;
 import com.example.repository.InstructorRepository;
 import com.example.repository.QuestionRepository;
+import com.example.repository.RoleRepository;
+import com.example.repository.UserRepository;
+import com.example.utilities.PinEncoderUtils;
 import com.example.utilities.PublicIdGeneratorUtils;
+import com.example.utilities.Roles;
 import com.example.utilities.TokenGenerators;
 
 @Service
@@ -43,6 +46,10 @@ public class InstructorServiceImpl implements InstructorService {
 	
 	private QuestionRepository questionRepository;
 	
+	private RoleRepository roleRepository;
+	
+	private UserRepository userRepository;
+	
 	private BCryptPasswordEncoder passwordEncoder;
 
 	private ModelMapper modelMapper;
@@ -53,11 +60,14 @@ public class InstructorServiceImpl implements InstructorService {
 
 
 	public InstructorServiceImpl(CourseRepository courseRepository, InstructorRepository instructorRepository,
-			QuestionRepository questionRepository, BCryptPasswordEncoder passwordEncoder, ModelMapper modelMapper) {
+			QuestionRepository questionRepository, RoleRepository roleRepository,
+			UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, 
+			ModelMapper modelMapper) {
 		super();
 		this.courseRepository = courseRepository;
 		this.instructorRepository = instructorRepository;
 		this.questionRepository = questionRepository;
+		this.roleRepository = roleRepository;
 		this.passwordEncoder = passwordEncoder;
 		this.modelMapper = modelMapper;
 	}
@@ -67,22 +77,18 @@ public class InstructorServiceImpl implements InstructorService {
 		Instructor instructor = modelMapper.map(instructorDto, Instructor.class);
 		
 		User userInstructor = new User();
-		userInstructor.setEmail(instructor.getEmail());
+		userInstructor.setEmail(instructorDto.getEmail());
 		userInstructor.setEmailVerificationStatus(false);
-		userInstructor.setEmailVerificationToken(TokenGenerators.generateEmailVerificationToken(instructor.getEmail()));
-		userInstructor.setPassword(passwordEncoder.encode(instructor.getPassword()));
+		userInstructor.setEmailVerificationToken(TokenGenerators.generateEmailVerificationToken(instructorDto.getEmail()));
+		userInstructor.setPassword(passwordEncoder.encode(instructorDto.getPassword()));
 		userInstructor.setPasswordResetToken(null);
+		userInstructor.setPin(PinEncoderUtils.encodePin(instructorDto.getPin()));
 		
-		String salt = KeyGenerators.string().generateKey();
-		String secret = "christopher";
-		
-		TextEncryptor encryptor = Encryptors.text(secret, salt);
-		
-		
-		
-		userInstructor.setPin(encryptor.encrypt(instructorDto.getPin()));
-		userInstructor.setRoles(null);
+		Optional<Role> optionalRole = roleRepository.findByName(Roles.ROLE_INSTRUCTOR.name());
+		userInstructor.setRoles(Arrays.asList(optionalRole.get()));
 
+		userRepository.save(userInstructor);
+		
 		instructorRepository.save(instructor);
 	}
 

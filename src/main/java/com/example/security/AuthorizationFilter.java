@@ -93,5 +93,4 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
 		
 		return new UsernamePasswordAuthenticationToken(userPrincipal.getUsername(), null, userPrincipal.getAuthorities());
 	}
-
 }

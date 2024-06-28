@@ -18,4 +18,6 @@ public class SecurityConstants {
 	
 	public static final long TOKEN_EXPIRATION_TIME = 600000;
 	
+	public static final long EMAIL_TOKEN_EXPIRATION_TIME = 7200;
+	
 }

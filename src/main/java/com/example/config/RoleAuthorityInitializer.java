@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import com.example.model.entity.Authority;
 import com.example.model.entity.Role;
 import com.example.model.entity.User;
+import com.example.model.entity.UserType;
 import com.example.repository.AuthorityRepository;
 import com.example.repository.RoleRepository;
 import com.example.repository.UserRepository;
@@ -78,6 +79,9 @@ public class RoleAuthorityInitializer {
 		createRole("ROLE_STUDENT", Arrays.asList(createStudent, getStudent,
 				updateStudent, viewStudent, getCourse, viewCourse));
 		
+		createRole("ROLE_INSTRUCTOR", Arrays.asList(createCourse, getCourse,
+				updateCourse, viewCourse, viewStudent, getStudent));
+		
 		
 		Optional<User> optional = userRepository.findByEmail(SUPER_ADMIN_EMAIL);
 		
@@ -90,6 +94,7 @@ public class RoleAuthorityInitializer {
 			superAdmin.setPassword("christopher");
 			superAdmin.setPasswordResetToken(null);	
 			superAdmin.setPin(PinEncoderUtils.encodePin("12345"));
+			superAdmin.setUserType(UserType.ADMIN);
 			
 			superAdmin.getRoles().add(superAdminRole);
 			

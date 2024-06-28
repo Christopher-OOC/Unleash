@@ -105,5 +105,5 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 		
 		response.addHeader(SecurityConstants.AUTHORIZATION_HEADER_NAME, SecurityConstants.AUTHORIZATION_HEADER_PREFIX + token);
 		response.addHeader("userId", userId);
-	}
+	} 
 }

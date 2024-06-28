@@ -48,8 +48,6 @@ public class Student {
 	@Column(unique=true)
 	private String email;
 	
-	private String password;
-	
 	@ManyToMany(fetch=FetchType.EAGER)
 	@JoinTable(name="course_student_enrolled", joinColumns=@JoinColumn(name="student_id"),
 			inverseJoinColumns=@JoinColumn(name="course_id"))

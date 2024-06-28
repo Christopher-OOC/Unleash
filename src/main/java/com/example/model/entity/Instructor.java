@@ -40,8 +40,6 @@ public class Instructor {
 	@Column(unique=true)
 	private String email;
 	
-	private String password;
-	
 	@OneToMany(mappedBy="instructor", cascade=CascadeType.ALL, fetch=FetchType.EAGER)
 	private List<Course> coursesTaken = new ArrayList<>();
 	
@@ -75,6 +73,6 @@ public class Instructor {
 	@Override
 	public String toString() {
 		return "Instructor [id=" + id + ", instructorId=" + instructorId + ", fullName=" + fullName + ", email=" + email
-				+ ", password=" + password + ", dateRegistered=" + dateRegistered + "]";
+				+ ", dateRegistered=" + dateRegistered + "]";
 	}
 }
