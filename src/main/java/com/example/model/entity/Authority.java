@@ -6,6 +6,7 @@ import java.util.Objects;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -26,7 +27,7 @@ public class Authority {
 	
 	private String name;
 	
-	@ManyToMany(mappedBy="authorities")
+	@ManyToMany(mappedBy="authorities", fetch=FetchType.EAGER)
 	List<Role> roles = new ArrayList<>();;
 	
 	public Authority(String name) {

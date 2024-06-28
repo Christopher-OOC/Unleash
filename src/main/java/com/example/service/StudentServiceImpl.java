@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.exceptions.AlreadyEnrolledForTheCourseException;
@@ -30,6 +31,7 @@ import com.example.repository.CourseRepository;
 import com.example.repository.RoleRepository;
 import com.example.repository.StudentRepository;
 import com.example.repository.UserRepository;
+import com.example.utilities.PinEncoderUtils;
 import com.example.utilities.PublicIdGeneratorUtils;
 import com.example.utilities.Roles;
 
@@ -43,6 +45,8 @@ public class StudentServiceImpl implements StudentService {
 	private RoleRepository roleRepository;
 	
 	private UserRepository userRepository;
+	
+	private BCryptPasswordEncoder passwordEncoder;
 
 	private ModelMapper modelMapper;
 
@@ -52,12 +56,14 @@ public class StudentServiceImpl implements StudentService {
 	private Map<String, String> propertyCourse = Map.of("course_name", "courseName", "course_code", "courseCode");
 
 	public StudentServiceImpl(StudentRepository studentRepository, CourseRepository courseRepository,
-			RoleRepository roleRepository, UserRepository userRepository, ModelMapper modelMapper) {
+			RoleRepository roleRepository, UserRepository userRepository,
+			BCryptPasswordEncoder passwordEncoder, ModelMapper modelMapper) {
 		super();
 		this.studentRepository = studentRepository;
 		this.courseRepository = courseRepository;
 		this.roleRepository = roleRepository;
 		this.userRepository = userRepository;
+		this.passwordEncoder = passwordEncoder;
 		this.modelMapper = modelMapper;
 	}
 
@@ -68,10 +74,10 @@ public class StudentServiceImpl implements StudentService {
 		user.setEmail(dto.getEmail());
 		user.setEmailVerificationStatus(false);
 		user.setEmailVerificationToken(null);
-		user.setPassword(dto.getPassword());
+		user.setPassword(passwordEncoder.encode(dto.getPassword()));
 		user.setPasswordResetToken(null);
 		user.setUserType(UserType.STUDENT);
-		user.setPin("123456");
+		user.setPin(PinEncoderUtils.encodePin("12345"));
 		
 		Optional<Role> optionalRole = roleRepository.findByName(Roles.ROLE_STUDENT.name());
 		user.setRoles(Arrays.asList(optionalRole.get()));

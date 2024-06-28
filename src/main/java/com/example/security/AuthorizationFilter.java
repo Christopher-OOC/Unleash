@@ -34,9 +34,7 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
 			chain.doFilter(request, response);
 		}
 		
-		String signingKey = "";
-		
-		SecretKey secret = new SecretKeySpec(signingKey.getBytes(), SIG.HS512.toString());
+		SecretKey secret = new SecretKeySpec(SecurityConstants.TOKEN_SIGINING_SECRET.getBytes(), SIG.HS512.toString());
 		
 		JwtParser jwtParser = Jwts.parser()
 			.setSigningKey(secret)

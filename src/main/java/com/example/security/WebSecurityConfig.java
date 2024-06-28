@@ -1,7 +1,9 @@
 package com.example.security;
 
+import java.util.Collections;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -20,6 +22,7 @@ import com.example.repository.UserRepository;
 @Configuration
 public class WebSecurityConfig {
 	
+	@Autowired
 	private UserRepository userRepository;
 	
 	@Bean
@@ -37,9 +40,11 @@ public class WebSecurityConfig {
 				throw new UsernameNotFoundException("No such user with username: " + args);
 			}
 			
-			User user = optional.get();
+			User userEntity = optional.get();
 			
-			return null;
+			var user = new org.springframework.security.core.userdetails.User(userEntity.getEmail(), userEntity.getPassword(), Collections.emptyList());
+			
+			return user;
 		};
 	}
 	
@@ -69,7 +74,7 @@ public class WebSecurityConfig {
 		
 		
 		// ADD FILTER
-		AuthenticationFilter authenticationFilter = new AuthenticationFilter(getAuthenticationManager(http));
+		AuthenticationFilter authenticationFilter = new AuthenticationFilter(getAuthenticationManager(http), userRepository);
 		authenticationFilter.setUsernameParameter("email");
 		authenticationFilter.setPasswordParameter("passowrd");
 		authenticationFilter.setFilterProcessesUrl(SecurityConstants.LOGIN_URL);

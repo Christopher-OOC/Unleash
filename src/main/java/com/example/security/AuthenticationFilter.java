@@ -29,6 +29,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.Jwts.SIG;
+import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -39,8 +40,9 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 	
 	private UserRepository userRepository;
 	
-	public AuthenticationFilter(AuthenticationManager manager) {
+	public AuthenticationFilter(AuthenticationManager manager, UserRepository userRepository) {
 		super(manager);
+		this.userRepository = userRepository;
 	}
 
 	@Override
@@ -67,7 +69,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 		
 		byte[] byteTokenSecret = SecurityConstants.TOKEN_SIGINING_SECRET.getBytes();
 		
-		SecretKey key = new SecretKeySpec(byteTokenSecret, SIG.HS512.toString());
+		SecretKey key = new SecretKeySpec(byteTokenSecret, SignatureAlgorithm.HS512.getJcaName());
 		
 		Instant now = Instant.now();
 		
@@ -98,7 +100,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 		
 		String token = Jwts
 			.builder()
-				.signWith(key, SIG.HS512)
+				.signWith(key, SignatureAlgorithm.HS512)
 				.claim("email", email)
 				.issuedAt(Date.from(now))
 				.expiration(Date.from(now.plusSeconds(SecurityConstants.TOKEN_EXPIRATION_TIME)))

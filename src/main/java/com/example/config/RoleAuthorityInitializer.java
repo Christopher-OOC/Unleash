@@ -59,7 +59,7 @@ public class RoleAuthorityInitializer {
 		Authority viewAdmin = createAuthority("VIEW_ADMIN_AUTHORITY");
 		
 		
-		
+		// CREATE SUPER ADMIN ROLE
 		Role superAdminRole = createRole("ROLE_SUPER_ADMIN", Arrays.asList(
 				createAdmin, 
 				getAdmin, 
@@ -73,8 +73,13 @@ public class RoleAuthorityInitializer {
 				viewCourse
 				));
 		
-		Optional<User> optional = userRepository.findByEmail(SUPER_ADMIN_EMAIL);
 		
+		//CREATE STUDENT ROLE
+		createRole("ROLE_STUDENT", Arrays.asList(createStudent, getStudent,
+				updateStudent, viewStudent, getCourse, viewCourse));
+		
+		
+		Optional<User> optional = userRepository.findByEmail(SUPER_ADMIN_EMAIL);
 		
 		if (optional.isEmpty()) {
 			
