@@ -11,6 +11,8 @@ public class PinDecoderUtils {
 		String secret = "christopher";
 		TextEncryptor encryptor = Encryptors.text(secret, salt);
 		
+		String test = "";
+		
 		return encryptor.decrypt(encoderPin);
 	}
 }
