@@ -36,8 +36,6 @@ public class RoleAuthorityInitializer {
 	@EventListener
 	public void initializeRolesAndAuthority(ApplicationReadyEvent event) {
 		
-		System.out.println("Hello, Christopher");
-		
 		// Course AUTHORITY
 		Authority createCourse = createAuthority("CREATE_COURSE_AUTHORITY");
 		Authority getCourse = createAuthority("GET_COURSE_AUTHORITY");
