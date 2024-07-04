@@ -15,10 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.example.exceptions.NoCourseAvailableException;
-import com.example.exceptions.NoSuchCourseFoundException;
-import com.example.exceptions.NoSuchInstructorException;
-import com.example.exceptions.NoSuchQuestionFoundException;
+import com.example.exceptions.NoResourceFoundException;
 import com.example.model.dto.CourseDto;
 import com.example.model.dto.InstructorDto;
 import com.example.model.dto.QuestionDto;
@@ -27,6 +24,7 @@ import com.example.model.entity.Instructor;
 import com.example.model.entity.Question;
 import com.example.model.entity.Role;
 import com.example.model.entity.User;
+import com.example.model.error.ResourceNotFoundType;
 import com.example.repository.CourseRepository;
 import com.example.repository.InstructorRepository;
 import com.example.repository.QuestionRepository;
@@ -120,7 +118,7 @@ public class InstructorServiceImpl implements InstructorService {
 		System.out.println(coursePage.getContent());
 
 		if (coursePage.getContent().isEmpty()) {
-			throw new NoCourseAvailableException("No course created");
+			throw new NoResourceFoundException(ResourceNotFoundType.NO_COURSE);
 		}
 		
 		java.lang.reflect.Type typeToken = new TypeToken<List<CourseDto>>() {}.getType();
@@ -133,7 +131,7 @@ public class InstructorServiceImpl implements InstructorService {
 		Optional<Instructor> optional = instructorRepository.findByInstructorId(instructorId);
 
 		if (optional.isEmpty()) {
-			throw new NoSuchInstructorException(instructorId);
+			throw new NoResourceFoundException(ResourceNotFoundType.NO_INSTRUCTOR);
 		}
 
 		return optional.get();
@@ -147,7 +145,7 @@ public class InstructorServiceImpl implements InstructorService {
 		Course course = checkIfCourseExists(courseId);
 		
 		if (!instructor.getCoursesTaken().contains(course)) {
-			throw new NoSuchCourseFoundException(courseId);
+			throw new NoResourceFoundException(ResourceNotFoundType.NO_COURSE);
 		}
 		
 		Question question = modelMapper.map(questionDto, Question.class);
@@ -172,7 +170,7 @@ public class InstructorServiceImpl implements InstructorService {
 		Course course = checkIfCourseExists(courseId);
 		
 		if (!instructor.getCoursesTaken().contains(course)) {
-			throw new NoSuchCourseFoundException(courseId);
+			throw new NoResourceFoundException(ResourceNotFoundType.NO_COURSE);
 		}
 		
 		Question formalQuestion = checkIfQuestionExists(questionId);
@@ -195,7 +193,7 @@ public class InstructorServiceImpl implements InstructorService {
 		Optional<Question> optional = questionRepository.findByQuestionId(questionId);
 		
 		if (optional.isEmpty()) {
-			throw new NoSuchQuestionFoundException(questionId);
+			throw new NoResourceFoundException(ResourceNotFoundType.NO_QUESTION);
 		}
 		
 		return optional.get();
@@ -205,7 +203,7 @@ public class InstructorServiceImpl implements InstructorService {
 		Optional<Course> optional = courseRepository.findByCourseId(courseId);
 		
 		if (optional.isEmpty()) {
-			throw new NoSuchCourseFoundException("" + courseId);
+			throw new NoResourceFoundException(ResourceNotFoundType.NO_COURSE);
 		}
 		
 		return optional.get();
@@ -220,8 +218,6 @@ public class InstructorServiceImpl implements InstructorService {
 		}
 		
 		Instructor instructor = optional.get();
-		
-		
 		
 		return modelMapper.map(instructor, InstructorDto.class);
 	}

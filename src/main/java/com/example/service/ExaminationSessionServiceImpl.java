@@ -6,13 +6,12 @@ import org.springframework.stereotype.Service;
 
 import com.example.exceptions.BadRequestException;
 import com.example.exceptions.ExaminationSessionAlreadyCreated;
-import com.example.exceptions.NoExaminationSessionException;
-import com.example.exceptions.NoSuchCourseFoundException;
-import com.example.exceptions.NoSuchInstructorException;
+import com.example.exceptions.NoResourceFoundException;
 import com.example.model.dto.ExaminationSessionDto;
 import com.example.model.entity.Course;
 import com.example.model.entity.ExaminationSession;
 import com.example.model.entity.Instructor;
+import com.example.model.error.ResourceNotFoundType;
 import com.example.repository.CourseRepository;
 import com.example.repository.ExaminationSessionRepository;
 import com.example.repository.InstructorRepository;
@@ -69,7 +68,7 @@ public class ExaminationSessionServiceImpl implements ExaminationSessionService 
 		Optional<Instructor> optional = instructorRepository.findByInstructorId(instructorId);
 		
 		if (optional.isEmpty()) {
-			throw new NoSuchInstructorException(instructorId);
+			throw new NoResourceFoundException(ResourceNotFoundType.NO_INSTRUCTOR);
 		}
 		
 		return optional.get();
@@ -79,7 +78,7 @@ public class ExaminationSessionServiceImpl implements ExaminationSessionService 
 		Optional<Course> optional = courseRepository.findByCourseId(courseId);
 		
 		if (optional.isEmpty()) {
-			throw new NoSuchCourseFoundException("" + courseId);
+			throw new NoResourceFoundException(ResourceNotFoundType.NO_COURSE);
 		}
 		
 		Course course = optional.get();
@@ -101,7 +100,7 @@ public class ExaminationSessionServiceImpl implements ExaminationSessionService 
 		ExaminationSession currentSession = examinationSessionRepository.findCurrentExaminationSession(courseId);
 		
 		if (currentSession == null) {
-			throw new NoExaminationSessionException(courseId);
+			throw new NoResourceFoundException(ResourceNotFoundType.NO_SESSION);
 		}
 		
 		currentSession.setSessionClosed(true);

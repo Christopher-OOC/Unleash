@@ -8,16 +8,13 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.example.exceptions.NoSuchCourseFoundException;
-import com.example.exceptions.NoSuchStudentFoundException;
 import com.example.exceptions.NotRegisteredForTheCourseException;
 import com.example.exceptions.OngoingExaminationException;
 import com.example.exceptions.ResultNotAvailableException;
 import com.example.exceptions.ExaminationCompletionException;
 import com.example.exceptions.ExaminationHasEndedException;
 import com.example.exceptions.ExaminationNoLongerAvailableException;
-import com.example.exceptions.NoExaminationSessionException;
-import com.example.exceptions.NoOngoingExaminationException;
+import com.example.exceptions.NoResourceFoundException;
 import com.example.model.dto.ExaminationDto;
 import com.example.model.dto.ExaminationQuestionAnswerDto;
 import com.example.model.dto.ExaminationResultDto;
@@ -31,6 +28,7 @@ import com.example.model.entity.ExaminationStatus;
 import com.example.model.entity.Question;
 import com.example.model.entity.QuestionOption;
 import com.example.model.entity.Student;
+import com.example.model.error.ResourceNotFoundType;
 import com.example.repository.CourseRepository;
 import com.example.repository.ExaminationQuestionAnswerRepository;
 import com.example.repository.ExaminationRepository;
@@ -133,7 +131,7 @@ public class ExaminationServiceImpl implements ExaminationService {
 		ExaminationSession session = sessionRepository.findCurrentExaminationSession(courseId);
 
 		if (session == null) {
-			throw new NoExaminationSessionException(courseId);
+			throw new NoResourceFoundException(ResourceNotFoundType.NO_SESSION);
 		}
 		return session;
 	}
@@ -142,7 +140,7 @@ public class ExaminationServiceImpl implements ExaminationService {
 		Optional<Course> optionalCourse = courseRepository.findByCourseId(courseId);
 
 		if (optionalCourse.isEmpty()) {
-			throw new NoSuchCourseFoundException("" + courseId);
+			throw new NoResourceFoundException(ResourceNotFoundType.NO_COURSE);
 		}
 		
 		return optionalCourse.get();
@@ -152,7 +150,7 @@ public class ExaminationServiceImpl implements ExaminationService {
 		Optional<Student> optionalStudent = studentRepository.findByStudentId(studentId);
 
 		if (optionalStudent.isEmpty()) {
-			throw new NoSuchStudentFoundException(studentId);
+			throw new NoResourceFoundException(ResourceNotFoundType.NO_STUDENT);
 		}
 
 	    return optionalStudent.get();
@@ -190,7 +188,7 @@ public class ExaminationServiceImpl implements ExaminationService {
 		Optional<Examination> optionalExamination = examinationRepository.findById(id);
 
 		if (optionalExamination.isEmpty()) {
-			throw new NoOngoingExaminationException(studentId);
+			throw new NoResourceFoundException(ResourceNotFoundType.NO_ONGOING_EXAM);
 		}
 		
 		Examination examination = optionalExamination.get();
@@ -207,7 +205,7 @@ public class ExaminationServiceImpl implements ExaminationService {
 		Optional<Examination> optionalExamination = examinationRepository.findById(id);
 
 		if (optionalExamination.isEmpty()) {
-			throw new NoOngoingExaminationException(studentId);
+			throw new NoResourceFoundException(ResourceNotFoundType.NO_ONGOING_EXAM);
 		}
 		
 		Examination examination = optionalExamination.get();
@@ -224,7 +222,7 @@ public class ExaminationServiceImpl implements ExaminationService {
 		Optional<ExaminationSession> optional = sessionRepository.findById(sessionId);
 
 		if (optional.isEmpty()) {
-			throw new NoExaminationSessionException("" + sessionId);
+			throw new NoResourceFoundException(ResourceNotFoundType.NO_SESSION);
 		}
 		
 		ExaminationSession session = optional.get();

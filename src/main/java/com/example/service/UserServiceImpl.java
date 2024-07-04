@@ -5,8 +5,9 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.example.exceptions.NoUserFoundException;
+import com.example.exceptions.NoResourceFoundException;
 import com.example.model.entity.User;
+import com.example.model.error.ResourceNotFoundType;
 import com.example.repository.UserRepository;
 
 @Service
@@ -21,7 +22,7 @@ public class UserServiceImpl implements UserService {
 		Optional<User> optional = userRepository.findByEmail(email);
 		
 		if (optional.isEmpty()) {
-			throw new NoUserFoundException(email);
+			throw new NoResourceFoundException(ResourceNotFoundType.NO_USER);
 		}
 		
 		return optional.get();

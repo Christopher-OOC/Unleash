@@ -16,9 +16,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.exceptions.AlreadyEnrolledForTheCourseException;
-import com.example.exceptions.NoCourseAvailableException;
-import com.example.exceptions.NoSuchCourseFoundException;
-import com.example.exceptions.NoSuchStudentFoundException;
+import com.example.exceptions.NoResourceFoundException;
 import com.example.exceptions.ResourceNotFoundException;
 import com.example.model.dto.CourseDto;
 import com.example.model.dto.StudentDto;
@@ -27,6 +25,7 @@ import com.example.model.entity.Role;
 import com.example.model.entity.Student;
 import com.example.model.entity.User;
 import com.example.model.entity.UserType;
+import com.example.model.error.ResourceNotFoundType;
 import com.example.repository.CourseRepository;
 import com.example.repository.RoleRepository;
 import com.example.repository.StudentRepository;
@@ -99,7 +98,7 @@ public class StudentServiceImpl implements StudentService {
 		Optional<Student> optional = studentRepository.findByStudentId(studentId);
 
 		if (optional.isEmpty()) {
-			throw new NoSuchStudentFoundException(studentId);
+			throw new NoResourceFoundException(ResourceNotFoundType.NO_STUDENT);
 		}
 
 		return modelMapper.map(optional.get(), StudentDto.class);
@@ -109,7 +108,7 @@ public class StudentServiceImpl implements StudentService {
 		Optional<Course> optional = courseRepository.findByCourseId(courseId);
 
 		if (optional.isEmpty()) {
-			throw new NoSuchCourseFoundException("" + courseId);
+			throw new NoResourceFoundException(ResourceNotFoundType.NO_COURSE);
 		}
 
 		return modelMapper.map(optional.get(), CourseDto.class);
@@ -179,7 +178,7 @@ public class StudentServiceImpl implements StudentService {
 		StudentDto dto = checkIfStudentExist(studentId);
 
 		if (dto.getCoursesTaken().isEmpty()) {
-			throw new NoCourseAvailableException("You don't have any enrolled course");
+			throw new NoResourceFoundException(ResourceNotFoundType.NO_COURSE);
 		}
 		
 		Sort sort = prepareSortByFields(sortOptions, propertyCourse);

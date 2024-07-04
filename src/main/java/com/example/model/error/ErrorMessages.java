@@ -1,4 +1,4 @@
-package com.example.model.dto;
+package com.example.model.error;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class ErrorDto {
+public class ErrorMessages {
 	
 	@JsonProperty("error_date")
 	private Date errorDate = new Date();

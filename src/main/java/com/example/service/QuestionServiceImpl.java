@@ -2,16 +2,16 @@ package com.example.service;
 
 import java.util.List;
 
+
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import com.example.exceptions.NoQuestionAvailableForTheCourseException;
-import com.example.exceptions.NoSuchCourseFoundException;
-import com.example.exceptions.NoSuchQuestionFoundException;
+import com.example.exceptions.NoResourceFoundException;
 import com.example.model.entity.Course;
 import com.example.model.entity.Question;
+import com.example.model.error.ResourceNotFoundType;
 import com.example.repository.CourseRepository;
 import com.example.repository.QuestionRepository;
 
@@ -43,7 +43,7 @@ public class QuestionServiceImpl implements QuestionService {
 		Optional<Question> optional = questionRepository.findByQuestionId(questionId);
 		
 		if (optional.isEmpty()) {
-			throw new NoSuchQuestionFoundException(questionId);
+			throw new NoResourceFoundException(ResourceNotFoundType.NO_QUESTION);
 		}
 		
 		return optional.get();
@@ -60,7 +60,7 @@ public class QuestionServiceImpl implements QuestionService {
 		List<Question> questions = questionRepository.getAllAvailableQuestionForACourse(courseId);
 		
 		if (questions.isEmpty()) {
-			throw new NoQuestionAvailableForTheCourseException(courseId);
+			throw new NoResourceFoundException(ResourceNotFoundType.NO_QUESTION);
 		}
 		
 		return questions;
@@ -70,7 +70,7 @@ public class QuestionServiceImpl implements QuestionService {
 		Optional<Course> optional = courseRepository.findByCourseId(courseId);
 		
 		if (optional.isEmpty()) {
-			throw new NoSuchCourseFoundException("" + courseId);
+			throw new NoResourceFoundException(ResourceNotFoundType.NO_COURSE);
 		}
 		
 		return optional.get();
