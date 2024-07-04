@@ -59,18 +59,7 @@ public class RoleAuthorityInitializer {
 		
 		
 		// CREATE SUPER ADMIN ROLE
-		Role superAdminRole = createRole("ROLE_SUPER_ADMIN", Arrays.asList(
-				createAdmin, 
-				getAdmin, 
-				deleteAdmin,
-				viewAdmin,
-				getStudent,
-				deleteStudent,
-				viewStudent,
-				getCourse,
-				deleteCourse,
-				viewCourse
-				));
+		Role superAdminRole = createRole("ROLE_SUPER_ADMIN", Arrays.asList());
 		
 		
 		//CREATE STUDENT ROLE
