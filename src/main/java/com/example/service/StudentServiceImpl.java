@@ -164,7 +164,7 @@ public class StudentServiceImpl implements StudentService {
 
 		Course course = modelMapper.map(courseDto, Course.class);
 
-		student.getCoursesTaken().add(course);
+		//student.getCoursesTaken().add(course);
 		
 		course.getStudentEnrolled().add(student);
 		

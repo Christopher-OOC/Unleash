@@ -49,7 +49,7 @@ public class Course {
 	@JoinColumn(name="instuctor_id")
 	private Instructor instructor;
 	
-	@ManyToMany(mappedBy="coursesTaken", fetch=FetchType.EAGER, cascade=CascadeType.ALL)
+	@ManyToMany(fetch=FetchType.EAGER, cascade=CascadeType.ALL)
 	private List<Student> studentEnrolled = new ArrayList<>();
 	
 	@OneToMany(mappedBy="course",  fetch=FetchType.LAZY)

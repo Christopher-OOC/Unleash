@@ -15,6 +15,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
@@ -48,10 +49,8 @@ public class Student {
 	@Column(unique=true)
 	private String email;
 	
-	@ManyToMany(fetch=FetchType.EAGER)
-	@JoinTable(name="course_student_enrolled", joinColumns=@JoinColumn(name="student_id"),
-			inverseJoinColumns=@JoinColumn(name="course_id"))
-	private List<Course> coursesTaken = new ArrayList<>();
+	@OneToMany(mappedBy="student", fetch=FetchType.EAGER)
+	private List<EnrolledCourse> coursesTaken = new ArrayList<>();
 
 	@Override
 	public boolean equals(Object obj) {
