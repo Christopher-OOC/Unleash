@@ -28,7 +28,7 @@ public class Authority {
 	private String name;
 	
 	@ManyToMany(mappedBy="authorities", fetch=FetchType.EAGER)
-	List<Role> roles = new ArrayList<>();;
+	List<Role> roles = new ArrayList<>();
 	
 	public Authority(String name) {
 		this.name = name;
