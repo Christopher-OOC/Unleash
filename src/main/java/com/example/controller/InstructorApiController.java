@@ -77,7 +77,7 @@ public class InstructorApiController {
 		// Check if password and confirmPassword are the same
 
 		if (!requestModel.getPassword().equals(requestModel.getConfirmPassword())) {
-			throw new PasswordNotTheSameException();
+			throw new BadRequestException("Password not the same!");
 		}
 
 		InstructorDto instructorDto = modelMapper.map(requestModel, InstructorDto.class);

@@ -7,6 +7,7 @@ import java.util.Objects;
 import org.hibernate.validator.constraints.Length;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -40,9 +41,8 @@ public class StudentRequestModel {
 	@NotBlank(message="Password cannot be empty")
 	@Length(min=8, max=20, message="Password must have between 8-20 characters")
 	private String password;
-	
-	@NotBlank(message="Confirm Password cannot be empty")
-	@Length(min=8, max=20, message="Password must have between 8-20 characters")
+
+	@JsonProperty("confirm_password")
 	private String confirmPassword;
 	
 	@Past(message="Date of birth must be in the past")

@@ -35,9 +35,9 @@ import jakarta.validation.ConstraintViolationException;
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-	@ExceptionHandler(NoResourceFoundException.class)
+	@ExceptionHandler(com.example.exceptions.NoResourceFoundException.class)
 	@ResponseStatus(HttpStatus.NOT_FOUND)
-	public ErrorMessage handleNoSuchInstructorException(HttpServletRequest request, NoResourceFoundException ex) {
+	public ErrorMessage handleNoSuchInstructorException(HttpServletRequest request, com.example.exceptions.NoResourceFoundException ex) {
 
 		ErrorMessage error = new ErrorMessage();
 

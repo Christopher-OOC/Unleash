@@ -60,7 +60,8 @@ public class WebSecurityConfig {
 		
 		 http
 			.authorizeHttpRequests(request -> request
-					.requestMatchers(HttpMethod.POST  ,SecurityConstants.SIGN_UP_URL).permitAll()
+					.requestMatchers(HttpMethod.POST  ,SecurityConstants.STUDENT_SIGN_UP_URL).permitAll()
+					.requestMatchers(HttpMethod.POST  ,SecurityConstants.INSTRUCTOR_SIGN_UP_URL).permitAll()
 					.requestMatchers(HttpMethod.GET, SecurityConstants.EMAIL_VERIFICATION_URL).permitAll()
 					.requestMatchers(HttpMethod.GET, SecurityConstants.PASSWORD_RESET_URL).permitAll()
 					.anyRequest().authenticated()

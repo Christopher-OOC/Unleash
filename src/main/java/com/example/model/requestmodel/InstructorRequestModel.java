@@ -36,6 +36,7 @@ public class InstructorRequestModel {
 	@Length(min=8, max=20, message="Confirm password must have between 8-20 characters")
 	private String confirmPassword;
 	
+	@NotBlank(message="Pin cannot be empty")
 	private String pin;
 	
 

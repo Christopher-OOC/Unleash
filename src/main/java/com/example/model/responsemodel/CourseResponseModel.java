@@ -26,9 +26,6 @@ public class CourseResponseModel extends RepresentationModel<CourseResponseModel
 	
 	private int numberOfStudentEnrolled;
 	
-	@JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd'T'HH:mm:ss")
-	private Date dateEnrolled;
-	
 	@JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd")
 	private Date dateCreated;
 	

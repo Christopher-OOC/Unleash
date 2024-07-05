@@ -30,6 +30,8 @@ public class User {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private long id;
 	
+	private String userId;
+	
 	@Column(unique=true, nullable=false)
 	private String email;
 	

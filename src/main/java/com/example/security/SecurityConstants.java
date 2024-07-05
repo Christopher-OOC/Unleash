@@ -2,7 +2,9 @@ package com.example.security;
 
 public class SecurityConstants {
 	
-	public static final String SIGN_UP_URL = "/v1/students";
+	public static final String STUDENT_SIGN_UP_URL = "/v1/students";
+	
+	public static final String INSTRUCTOR_SIGN_UP_URL = "/v1/instructors";
 	
 	public static final String LOGIN_URL = "/v1/login";
 	

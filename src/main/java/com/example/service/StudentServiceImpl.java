@@ -79,10 +79,11 @@ public class StudentServiceImpl implements StudentService {
 	public void register(StudentDto dto) {
 		
 		Student student = modelMapper.map(dto, Student.class);
-		dto.setStudentId(PublicIdGeneratorUtils.generateId(30));
+		student.setStudentId(PublicIdGeneratorUtils.generateId(30));
 		
 		User user = new User();
 		user.setEmail(dto.getEmail());
+		user.setUserId(student.getStudentId());
 		user.setEmailVerificationStatus(false);
 		user.setEmailVerificationToken(null);
 		user.setPassword(passwordEncoder.encode(dto.getPassword()));

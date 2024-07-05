@@ -29,6 +29,7 @@ import com.example.model.dto.EnrolledCourseDto;
 import com.example.model.dto.StudentDto;
 import com.example.model.requestmodel.StudentRequestModel;
 import com.example.model.responsemodel.CourseResponseModel;
+import com.example.model.responsemodel.EnrolledCourseResponseModel;
 import com.example.model.responsemodel.RequestStatusType;
 import com.example.model.responsemodel.ResponseMessageModel;
 import com.example.model.responsemodel.ResponseStatusType;
@@ -64,6 +65,10 @@ public class StudentApiController {
 
 	@PostMapping
 	public ResponseEntity<?> register(@RequestBody @Valid StudentRequestModel requestModel) {
+		
+		if (!requestModel.getPassword().equals(requestModel.getConfirmPassword())) {
+			throw new BadRequestException("Passwords not the same!!!");
+		}
 		
 		StudentDto dto = modelMapper.map(requestModel, StudentDto.class);
 		
@@ -151,11 +156,11 @@ public class StudentApiController {
 		
 		List<EnrolledCourseDto> listDto = allEnrolledCourses.getContent();
 		
-		List<CourseResponseModel> listResponse = new ArrayList<>();
+		List<EnrolledCourseResponseModel> listResponse = new ArrayList<>();
 
 		listDto.forEach(dto -> {
-			CourseResponseModel response = modelMapper.map(dto, CourseResponseModel.class);
-			response.setNumberOfStudentEnrolled(dto.getStudentEnrolled().size());
+			EnrolledCourseResponseModel response = modelMapper.map(dto, EnrolledCourseResponseModel.class);
+			response.getCourse().setNumberOfStudentEnrolled(dto.getCourse().getStudentEnrolled().size());
 			listResponse.add(response);
 		});
 		
@@ -166,20 +171,20 @@ public class StudentApiController {
 		
 		PageMetadata metadata = new PageMetadata(pageSize, pageNum, totalElements, totalPages);
 		
-		PagedModel<CourseResponseModel> pagedModel = PagedModel.of(listResponse, metadata);
+		PagedModel<EnrolledCourseResponseModel> pagedModel = PagedModel.of(listResponse, metadata);
 		
 		addNavigationLiksToCollectionModel(pagedModel, studentId, pageNum, pageSize, sortOptions, search, totalPages);
 		
 		return ResponseEntity.ok(pagedModel);
 	}
 	
-	private void addCourseSelfLinks(List<CourseResponseModel> listResponse) {
+	private void addCourseSelfLinks(List<EnrolledCourseResponseModel> listResponse) {
 		listResponse.forEach(response -> {
-			response.add(linkTo(methodOn(getClass()).getStudentById(response.getCourseId())).withSelfRel());
+			response.add(linkTo(methodOn(getClass()).getStudentById(response.getCourse().getCourseId())).withSelfRel());
 		});
 	}
 	
-	private void addNavigationLiksToCollectionModel(PagedModel<CourseResponseModel> pagedModel, String studentId,  int pageNum,
+	private void addNavigationLiksToCollectionModel(PagedModel<EnrolledCourseResponseModel> pagedModel, String studentId,  int pageNum,
 			int pageSize, String sortOptions, String filterField, int totalPages) {
 
 		// Add self link

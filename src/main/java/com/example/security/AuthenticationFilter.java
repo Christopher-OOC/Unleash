@@ -84,16 +84,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 		
 		User currentUser = optional.get();
 		
-		if (currentUser.getUserType() == UserType.INSTRUCTOR) {
-			InstructorDto instructorDto = ((InstructorService) CustomApplicationContext.getServiceBean("instructorServiceImpl")).getInstructorByEmail(email);
-			
-			userId = instructorDto.getInstructorId();
-		}
-		else if (currentUser.getUserType() == UserType.STUDENT) {
-			StudentDto studentDto = ((StudentService) CustomApplicationContext.getServiceBean("studentServiceImpl")).getStudentByEmail(email);
-			
-			userId = studentDto.getStudentId();
-		}
+		userId = currentUser.getUserId();
 		
 		String token = Jwts
 			.builder()
