@@ -28,8 +28,8 @@ public class EnrolledCourse {
 	@JoinColumn(name="student_id", insertable=false, updatable=false)
 	private Student student;
 	
-	@JoinColumn(name="course_id", insertable=false, updatable=false)
 	@ManyToOne
+	@JoinColumn(name="course_id", insertable=false, updatable=false)
 	private Course course;
 	
 	@Temporal(TemporalType.TIMESTAMP)
