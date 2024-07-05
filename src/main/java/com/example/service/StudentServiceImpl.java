@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.exceptions.AlreadyEnrolledForTheCourseException;
 import com.example.exceptions.NoResourceFoundException;
@@ -39,9 +40,11 @@ import com.example.utilities.PinEncoderUtils;
 import com.example.utilities.PublicIdGeneratorUtils;
 import com.example.utilities.Roles;
 
+import jakarta.persistence.EntityManager;
+
 @Service
 public class StudentServiceImpl implements StudentService {
-
+	
 	private StudentRepository studentRepository;
 
 	private CourseRepository courseRepository;
@@ -49,8 +52,6 @@ public class StudentServiceImpl implements StudentService {
 	private EnrolledCourseRepository enrolledCourseRepository;
 	
 	private RoleRepository roleRepository;
-	
-	private UserRepository userRepository;
 	
 	private BCryptPasswordEncoder passwordEncoder;
 
@@ -63,14 +64,13 @@ public class StudentServiceImpl implements StudentService {
 
 	public StudentServiceImpl(StudentRepository studentRepository, CourseRepository courseRepository,
 			RoleRepository roleRepository, EnrolledCourseRepository enrolledCourseRepository,
-			UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, 
+			BCryptPasswordEncoder passwordEncoder, 
 			ModelMapper modelMapper) {
 		super();
 		this.studentRepository = studentRepository;
 		this.courseRepository = courseRepository;
 		this.enrolledCourseRepository = enrolledCourseRepository;
 		this.roleRepository = roleRepository;
-		this.userRepository = userRepository;
 		this.passwordEncoder = passwordEncoder;
 		this.modelMapper = modelMapper;
 	}
@@ -165,9 +165,14 @@ public class StudentServiceImpl implements StudentService {
 	public void enrollForACourse(String studentId, String courseId) {
 		StudentDto studentDto = checkIfStudentExist(studentId);
 		
+		
 		CourseDto courseDto = checkIfCourseExist(courseId);
 		
-		EnrolledCourseId enrolledCourseId = new EnrolledCourseId(studentDto.getId(), courseDto.getId());
+		EnrolledCourseId enrolledCourseId = new EnrolledCourseId();
+		enrolledCourseId.setStudentId(studentDto.getId());
+		enrolledCourseId.setCourseId(courseDto.getId());
+		
+		System.out.println("STUDENT ID: " + studentDto.getId());
 		
 		Optional<EnrolledCourse> optionalEnrolled = enrolledCourseRepository.findById(enrolledCourseId);
 		
@@ -179,15 +184,17 @@ public class StudentServiceImpl implements StudentService {
 
 		Course course = modelMapper.map(courseDto, Course.class);
 		
+		course.getStudentEnrolled().add(student);
+		courseRepository.save(course);
+		
 		EnrolledCourse enrolledCourse = new EnrolledCourse();
 		enrolledCourse.setCourse(course);
 		enrolledCourse.setStudent(student);
 		enrolledCourse.setEnrolledOn(new Date());
 		
-		course.getStudentEnrolled().add(student);
+		student.getCoursesTaken().add(enrolledCourse);
 
-		courseRepository.save(course);
-		enrolledCourseRepository.save(enrolledCourse);
+		studentRepository.save(student);
 	}
 
 	@Override

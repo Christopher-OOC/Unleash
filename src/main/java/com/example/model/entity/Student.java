@@ -71,4 +71,10 @@ public class Student {
 	public int hashCode() {
 		return Objects.hash(studentId);
 	}
+
+	@Override
+	public String toString() {
+		return "Student [id=" + id + ", studentId=" + studentId + ", firstName=" + firstName + ", lastName=" + lastName
+				+ ", middleName=" + middleName + ", dateOfBirth=" + dateOfBirth + ", email=" + email + "]";
+	}
 }

@@ -15,6 +15,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
@@ -42,6 +43,9 @@ public class Instructor {
 	
 	@OneToMany(mappedBy="instructor", cascade=CascadeType.ALL, fetch=FetchType.EAGER)
 	private List<Course> coursesTaken = new ArrayList<>();
+	
+	@OneToOne(cascade=CascadeType.PERSIST)
+	private User user;
 	
 	@CreationTimestamp
 	@Temporal(TemporalType.DATE)

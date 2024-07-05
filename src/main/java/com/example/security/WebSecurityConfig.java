@@ -70,7 +70,6 @@ public class WebSecurityConfig {
 		http.csrf(csrf -> csrf.disable());
 		http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 		
-		
 		// ADD FILTER
 		AuthenticationFilter authenticationFilter = new AuthenticationFilter(getAuthenticationManager(http), userRepository);
 		authenticationFilter.setUsernameParameter("email");

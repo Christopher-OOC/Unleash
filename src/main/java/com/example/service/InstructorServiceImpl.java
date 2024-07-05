@@ -45,9 +45,7 @@ public class InstructorServiceImpl implements InstructorService {
 	private QuestionRepository questionRepository;
 	
 	private RoleRepository roleRepository;
-	
-	private UserRepository userRepository;
-	
+		
 	private BCryptPasswordEncoder passwordEncoder;
 
 	private ModelMapper modelMapper;
@@ -73,19 +71,25 @@ public class InstructorServiceImpl implements InstructorService {
 	@Override
 	public void save(InstructorDto instructorDto) {
 		Instructor instructor = modelMapper.map(instructorDto, Instructor.class);
+		instructor.setInstructorId(PublicIdGeneratorUtils.generateId(30));
 		
 		User userInstructor = new User();
 		userInstructor.setEmail(instructorDto.getEmail());
-		userInstructor.setEmailVerificationStatus(false);
+		userInstructor.setUserId(instructor.getInstructorId());
+		userInstructor.setEmailVerificationStatus(true);
 		userInstructor.setEmailVerificationToken(TokenGenerators.generateEmailVerificationToken(instructorDto.getEmail()));
 		userInstructor.setPassword(passwordEncoder.encode(instructorDto.getPassword()));
 		userInstructor.setPasswordResetToken(null);
 		userInstructor.setPin(PinEncoderUtils.encodePin(instructorDto.getPin()));
 		
 		Optional<Role> optionalRole = roleRepository.findByName(Roles.ROLE_INSTRUCTOR.name());
-		userInstructor.setRoles(Arrays.asList(optionalRole.get()));
+		
+		if (optionalRole.isPresent()) {
+			userInstructor.setRoles(Arrays.asList(optionalRole.get()));
+		}
+		
 
-		userRepository.save(userInstructor);
+		instructor.setUser(userInstructor);
 		
 		instructorRepository.save(instructor);
 	}
