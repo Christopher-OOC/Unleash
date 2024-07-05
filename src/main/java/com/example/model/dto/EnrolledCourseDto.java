@@ -12,18 +12,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class EnrolledCourseDto {
 
-	private EnrolledCourseId id = new EnrolledCourseId();
+	private EnrolledCourseId enrolledCourseId = new EnrolledCourseId();
 
 	private StudentDto student;
 
 	private CourseDto course;
 
 	private Date enrolledOn;
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(id);
-	}
 
 	@Override
 	public boolean equals(Object obj) {
@@ -34,6 +29,11 @@ public class EnrolledCourseDto {
 		if (getClass() != obj.getClass())
 			return false;
 		EnrolledCourseDto other = (EnrolledCourseDto) obj;
-		return Objects.equals(id, other.id);
+		return Objects.equals(enrolledCourseId, other.enrolledCourseId);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(enrolledCourseId);
 	}
 }

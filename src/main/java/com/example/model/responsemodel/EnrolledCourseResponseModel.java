@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.Objects;
 
 import org.springframework.hateoas.RepresentationModel;
+import org.springframework.hateoas.server.core.Relation;
 
 import com.example.model.entity.EnrolledCourseId;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -13,9 +14,10 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
+@Relation(collectionRelation="enrolled_courses")
 public class EnrolledCourseResponseModel extends RepresentationModel<CourseResponseModel> {
 
-	private EnrolledCourseId id = new EnrolledCourseId();
+	private EnrolledCourseId enrolledCourseId = new EnrolledCourseId();
 
 	private StudentResponseModel student;
 
@@ -25,19 +27,22 @@ public class EnrolledCourseResponseModel extends RepresentationModel<CourseRespo
 	private Date enrolledOn;
 
 	@Override
-	public int hashCode() {
-		return Objects.hash(id);
-	}
-
-	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (obj == null)
+		if (!super.equals(obj))
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
 		EnrolledCourseResponseModel other = (EnrolledCourseResponseModel) obj;
-		return Objects.equals(id, other.id);
+		return Objects.equals(enrolledCourseId, other.enrolledCourseId);
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + Objects.hash(enrolledCourseId);
+		return result;
 	}
 }
