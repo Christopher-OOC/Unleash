@@ -234,4 +234,18 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
 		return new ResponseEntity<>(error, headers, status);
 	}
+	
+//	@ExceptionHandler(Exception.class)
+//	@ResponseStatus(HttpStatus.BAD_REQUEST)
+//	public ErrorMessage handleGeneralException(HttpServletRequest request, Exception ex) {
+//
+//		ErrorMessage error = new ErrorMessage();
+//
+//		error.setStatus(HttpStatus.BAD_REQUEST.value());
+//		error.setPath(request.getServletPath());
+//		error.setMessage(ex.getMessage());
+//
+//		return error;
+//	}
+
 }

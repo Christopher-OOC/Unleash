@@ -3,6 +3,7 @@ package com.example.service;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -15,7 +16,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.example.exceptions.AlreadyEnrolledForTheCourseException;
 import com.example.exceptions.NoResourceFoundException;
@@ -29,18 +29,14 @@ import com.example.model.entity.EnrolledCourseId;
 import com.example.model.entity.Role;
 import com.example.model.entity.Student;
 import com.example.model.entity.User;
-import com.example.model.entity.UserType;
 import com.example.model.error.ResourceNotFoundType;
 import com.example.repository.CourseRepository;
 import com.example.repository.EnrolledCourseRepository;
 import com.example.repository.RoleRepository;
 import com.example.repository.StudentRepository;
-import com.example.repository.UserRepository;
 import com.example.utilities.PinEncoderUtils;
 import com.example.utilities.PublicIdGeneratorUtils;
 import com.example.utilities.Roles;
-
-import jakarta.persistence.EntityManager;
 
 @Service
 public class StudentServiceImpl implements StudentService {
@@ -112,8 +108,10 @@ public class StudentServiceImpl implements StudentService {
 		if (optional.isEmpty()) {
 			throw new NoResourceFoundException(ResourceNotFoundType.NO_STUDENT);
 		}
-
-		return modelMapper.map(optional.get(), StudentDto.class);
+		
+		StudentDto studentDto = modelMapper.map(optional.get(), StudentDto.class);
+		
+		return studentDto;
 	}
 
 	private CourseDto checkIfCourseExist(String courseId) {
@@ -208,10 +206,15 @@ public class StudentServiceImpl implements StudentService {
 		
 		Page<EnrolledCourse> coursePage = courseRepository.findCoursesEnrolledByStudent(id, pageable, search);
 
-		java.lang.reflect.Type typeToken = new TypeToken<List<EnrolledCourseDto>>() {}.getType();
-		List<EnrolledCourseDto> listDto = modelMapper.map(coursePage.getContent(), typeToken);
+		System.out.println(coursePage.getContent().size());
 		
-		Page<EnrolledCourseDto> dtoPage = new PageImpl<>(listDto, pageable, coursePage.getTotalElements());
+		List<EnrolledCourseDto> list = new ArrayList<>();
+		
+		coursePage.getContent().forEach(courseEnrolled -> {
+			list.add(modelMapper.map(courseEnrolled, EnrolledCourseDto.class));
+		});
+		
+		Page<EnrolledCourseDto> dtoPage = new PageImpl<>(list, pageable, coursePage.getTotalElements());
 		
 		return dtoPage;
 	}
