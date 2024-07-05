@@ -118,6 +118,7 @@ public class StudentApiController {
 		List<StudentResponseModel> listResponse = modelMapper.map(listDto, typeToken);
 
 		addStudentSelfLinks(listResponse);
+		addEnrollCoursesLinks(listResponse);
 
 		long totalElements = studentPage.getTotalElements();
 		long totalPages = studentPage.getTotalPages();
@@ -127,6 +128,13 @@ public class StudentApiController {
 		PagedModel<StudentResponseModel> pagedModel = PagedModel.of(listResponse, metadata);
 
 		return ResponseEntity.ok(pagedModel);
+	}
+
+	private void addEnrollCoursesLinks(List<StudentResponseModel> listResponse) {
+		
+		listResponse.forEach(response -> {
+			response.add(linkTo(methodOn(getClass()).getAllCourseEnrolledByStudent(response.getStudentId(), 1, 3, "", "")).withRel("enrolled_courses"));
+		});
 	}
 
 	@PostMapping("/{studentId}/courses/{courseId}")
