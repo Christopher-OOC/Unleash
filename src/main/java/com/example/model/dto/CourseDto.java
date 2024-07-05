@@ -22,7 +22,7 @@ public class CourseDto {
 	
 	private InstructorDto instructor;
 	
-	private List<StudentDto> studentEnrolled = new ArrayList<>();
+	private List<EnrolledCourseDto> studentEnrolled = new ArrayList<>();
 	
 	private List<QuestionDto> allAvailableQuestions = new ArrayList<>();
 	

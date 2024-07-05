@@ -114,9 +114,9 @@ public class FilterCourseRepositoryImpl implements FilterCourseRepository {
 
 		pageable.getSort().stream().forEach(order -> {
 			if (order.isAscending()) {
-				listOrder.add(builder.asc(root.get(order.getProperty())));
+				listOrder.add(builder.asc(root.get("course").get(order.getProperty())));
 			} else {
-				listOrder.add(builder.desc(root.get(order.getProperty())));
+				listOrder.add(builder.desc(root.get("course").get(order.getProperty())));
 			}
 		});
 
@@ -139,14 +139,14 @@ public class FilterCourseRepositoryImpl implements FilterCourseRepository {
 			Root<?> root) {
 
 		// CREATE WHERE CLAUSE
-		Predicate predicate = builder.equal(root.get("student").get("studentId"), studentId);
+		Predicate predicate = builder.equal(root.get("student").get("id"), studentId);
 		Predicate predicate1 = null;
 		Predicate predicate2 = null;
 		Predicate predicate3 = null;
 
 		if (!"".equals(search)) {
-			predicate2 = builder.like(root.get("courseCode"), "%" + search + "%");
-			predicate3 = builder.like(root.get("courseName"), "%" + search + "%");
+			predicate2 = builder.like(root.get("course").get("courseCode"), "%" + search + "%");
+			predicate3 = builder.like(root.get("course").get("courseName"), "%" + search + "%");
 
 			predicate1 = builder.or(predicate2, predicate3);
 
@@ -162,7 +162,7 @@ public class FilterCourseRepositoryImpl implements FilterCourseRepository {
 		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 		CriteriaQuery<Long> query = builder.createQuery(Long.class);
 
-		Root<Course> root = query.from(Course.class);
+		Root<EnrolledCourse> root = query.from(EnrolledCourse.class);
 		
 		searchQuery(studentId, search, builder, query, root);
 		

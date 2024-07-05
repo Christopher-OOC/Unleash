@@ -49,6 +49,9 @@ public class Course {
 	@JoinColumn(name="instuctor_id")
 	private Instructor instructor;
 	
+	@OneToMany(mappedBy="course", fetch=FetchType.EAGER)
+	private List<EnrolledCourse> studentEnrolled = new ArrayList<>();
+	
 	@OneToMany(mappedBy="course",  fetch=FetchType.LAZY)
 	private List<Question> allAvailableQuestions = new ArrayList<>();
 	
