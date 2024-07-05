@@ -46,9 +46,6 @@ public class User {
 	
 	private String passwordResetToken;
 	
-	@Enumerated(EnumType.STRING)
-	private UserType userType;
-	
 	@ManyToMany(fetch=FetchType.EAGER)
 	@JoinTable(name="users_roles", 
 		joinColumns=@JoinColumn(name="users_id", referencedColumnName="id"),

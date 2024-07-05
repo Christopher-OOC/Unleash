@@ -69,22 +69,24 @@ public class StudentServiceImpl implements StudentService {
 	@Override
 	public void register(StudentDto dto) {
 		
+		Student student = modelMapper.map(dto, Student.class);
+		dto.setStudentId(PublicIdGeneratorUtils.generateId(30));
+		
 		User user = new User();
 		user.setEmail(dto.getEmail());
 		user.setEmailVerificationStatus(false);
 		user.setEmailVerificationToken(null);
 		user.setPassword(passwordEncoder.encode(dto.getPassword()));
 		user.setPasswordResetToken(null);
-		user.setUserType(UserType.STUDENT);
 		user.setPin(PinEncoderUtils.encodePin(dto.getPin()));
 		
 		Optional<Role> optionalRole = roleRepository.findByName(Roles.ROLE_STUDENT.name());
-		user.setRoles(Arrays.asList(optionalRole.get()));
 		
-		userRepository.save(user);
+		if (optionalRole.isPresent()) {
+			user.setRoles(Arrays.asList(optionalRole.get()));
+		}
 		
-		dto.setStudentId(PublicIdGeneratorUtils.generateId(30));
-		Student student = modelMapper.map(dto, Student.class);
+		student.setUser(user);
 
 		studentRepository.save(student);
 	}
