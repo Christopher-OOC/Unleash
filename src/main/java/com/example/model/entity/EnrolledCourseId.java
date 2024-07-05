@@ -21,6 +21,11 @@ public class EnrolledCourseId implements Serializable {
 	
 	@Column(name="course_id")
 	private int courseId;
+	
+	public EnrolledCourseId(int studentId, int courseId) {
+		this.studentId = studentId;
+		this.courseId = courseId;
+	}
 
 	@Override
 	public boolean equals(Object obj) {

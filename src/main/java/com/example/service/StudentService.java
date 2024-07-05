@@ -3,6 +3,7 @@ package com.example.service;
 import org.springframework.data.domain.Page;
 
 import com.example.model.dto.CourseDto;
+import com.example.model.dto.EnrolledCourseDto;
 import com.example.model.dto.StudentDto;
 
 public interface StudentService {
@@ -15,7 +16,7 @@ public interface StudentService {
 	
 	void enrollForACourse(String studentId, String courseId);
 	
-	Page<CourseDto> getEnrolledCoursesForAStudent(String studentId, int pageNum, int pageSize, String sortOptions, String search);
+	Page<EnrolledCourseDto> getEnrolledCoursesForAStudent(String studentId, int pageNum, int pageSize, String sortOptions, String search);
 
 	StudentDto getStudentByEmail(String email);
 	

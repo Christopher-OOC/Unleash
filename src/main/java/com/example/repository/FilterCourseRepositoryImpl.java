@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import com.example.model.entity.Course;
+import com.example.model.entity.EnrolledCourse;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
@@ -98,11 +99,11 @@ public class FilterCourseRepositoryImpl implements FilterCourseRepository {
 	}
 
 	@Override
-	public Page<Course> findCoursesEnrolledByStudent(int studentId, Pageable pageable, String search) {
+	public Page<EnrolledCourse> findCoursesEnrolledByStudent(int studentId, Pageable pageable, String search) {
 		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-		CriteriaQuery<Course> query = builder.createQuery(Course.class);
+		CriteriaQuery<EnrolledCourse> query = builder.createQuery(EnrolledCourse.class);
 
-		Root<Course> root = query.from(Course.class);
+		Root<EnrolledCourse> root = query.from(EnrolledCourse.class);
 
 		// SEARCH QUERY
 		searchQuery(studentId, search, builder, query, root);
@@ -121,13 +122,13 @@ public class FilterCourseRepositoryImpl implements FilterCourseRepository {
 
 		query.orderBy(listOrder);
 
-		TypedQuery<Course> typedQuery = entityManager.createQuery(query);
+		TypedQuery<EnrolledCourse> typedQuery = entityManager.createQuery(query);
 
 		// CREATE PAGINATION CLAUSE
 		typedQuery.setFirstResult((int) pageable.getOffset());
 		typedQuery.setMaxResults(pageable.getPageSize());
 
-		List<Course> returnCourses = typedQuery.getResultList();
+		List<EnrolledCourse> returnCourses = typedQuery.getResultList();
 		
 		long totalElements = generateTotalRowsCoursesByStudent(studentId, search);
 
@@ -135,12 +136,10 @@ public class FilterCourseRepositoryImpl implements FilterCourseRepository {
 	}
 
 	private void searchQuery(int studentId, String search, CriteriaBuilder builder, CriteriaQuery<?> query,
-			Root<Course> root) {
-
-		ListJoin<Object, Object> joinList = root.joinList("studentEnrolled");
+			Root<?> root) {
 
 		// CREATE WHERE CLAUSE
-		Predicate predicate = builder.equal(joinList.get("id"), studentId);
+		Predicate predicate = builder.equal(root.get("student").get("studentId"), studentId);
 		Predicate predicate1 = null;
 		Predicate predicate2 = null;
 		Predicate predicate3 = null;

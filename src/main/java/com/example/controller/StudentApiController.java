@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.exceptions.BadRequestException;
 import com.example.model.dto.CourseDto;
+import com.example.model.dto.EnrolledCourseDto;
 import com.example.model.dto.StudentDto;
 import com.example.model.requestmodel.StudentRequestModel;
 import com.example.model.responsemodel.CourseResponseModel;
@@ -145,10 +146,10 @@ public class StudentApiController {
 
 		validateSortFields(sortOptions, propertyCourse);
 
-		Page<CourseDto> allEnrolledCourses = studentService.getEnrolledCoursesForAStudent(studentId, pageNum - 1,
+		Page<EnrolledCourseDto> allEnrolledCourses = studentService.getEnrolledCoursesForAStudent(studentId, pageNum - 1,
 				pageSize, sortOptions, search);
 		
-		List<CourseDto> listDto = allEnrolledCourses.getContent();
+		List<EnrolledCourseDto> listDto = allEnrolledCourses.getContent();
 		
 		List<CourseResponseModel> listResponse = new ArrayList<>();
 

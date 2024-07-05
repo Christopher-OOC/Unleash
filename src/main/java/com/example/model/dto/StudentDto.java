@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
+import com.example.model.entity.EnrolledCourse;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -30,7 +32,7 @@ public class StudentDto {
 	
 	private Date dateOfBirth;
 	
-	private List<CourseDto> coursesTaken = new ArrayList<>();
+	private List<EnrolledCourseDto> coursesTaken = new ArrayList<>();
 
 	@Override
 	public boolean equals(Object obj) {

@@ -81,7 +81,6 @@ public class RoleAuthorityInitializer {
 			superAdmin.setPassword("christopher");
 			superAdmin.setPasswordResetToken(null);	
 			superAdmin.setPin(PinEncoderUtils.encodePin("12345"));
-			superAdmin.setUserType(UserType.ADMIN);
 			
 			superAdmin.getRoles().add(superAdminRole);
 			
