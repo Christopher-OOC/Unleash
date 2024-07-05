@@ -88,6 +88,7 @@ public class StudentApiController {
 		StudentResponseModel response = modelMapper.map(dto, StudentResponseModel.class);
 
 		addStudentSelfLinks(List.of(response));
+		addEnrollCoursesLinks(List.of(response));
 
 		return ResponseEntity.ok(response);
 	}

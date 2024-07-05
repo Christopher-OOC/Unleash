@@ -205,8 +205,6 @@ public class StudentServiceImpl implements StudentService {
 		int id = dto.getId();
 		
 		Page<EnrolledCourse> coursePage = courseRepository.findCoursesEnrolledByStudent(id, pageable, search);
-
-		System.out.println(coursePage.getContent().size());
 		
 		List<EnrolledCourseDto> list = new ArrayList<>();
 		
