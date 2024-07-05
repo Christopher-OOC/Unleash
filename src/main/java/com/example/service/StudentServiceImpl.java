@@ -171,12 +171,10 @@ public class StudentServiceImpl implements StudentService {
 		EnrolledCourseId enrolledCourseId = new EnrolledCourseId();
 		enrolledCourseId.setStudentId(studentDto.getId());
 		enrolledCourseId.setCourseId(courseDto.getId());
+				
+		EnrolledCourse enrolledCourse = enrolledCourseRepository.findByEnrolledCourseId(enrolledCourseId);
 		
-		System.out.println("STUDENT ID: " + studentDto.getId());
-		
-		Optional<EnrolledCourse> optionalEnrolled = enrolledCourseRepository.findById(enrolledCourseId);
-		
-		if (optionalEnrolled.isPresent()) {
+		if (enrolledCourse != null) {
 			throw new AlreadyEnrolledForTheCourseException(courseId);
 		}
 
@@ -184,17 +182,13 @@ public class StudentServiceImpl implements StudentService {
 
 		Course course = modelMapper.map(courseDto, Course.class);
 		
-		course.getStudentEnrolled().add(student);
-		courseRepository.save(course);
+		EnrolledCourse newEnrolledCourse = new EnrolledCourse();
+		newEnrolledCourse.setEnrolledCourseId(enrolledCourseId);
+		newEnrolledCourse.setCourse(course);
+		newEnrolledCourse.setStudent(student);
+		newEnrolledCourse.setEnrolledOn(new Date());
 		
-		EnrolledCourse enrolledCourse = new EnrolledCourse();
-		enrolledCourse.setCourse(course);
-		enrolledCourse.setStudent(student);
-		enrolledCourse.setEnrolledOn(new Date());
-		
-		student.getCoursesTaken().add(enrolledCourse);
-
-		studentRepository.save(student);
+		enrolledCourseRepository.save(newEnrolledCourse);
 	}
 
 	@Override

@@ -49,9 +49,6 @@ public class Course {
 	@JoinColumn(name="instuctor_id")
 	private Instructor instructor;
 	
-	@ManyToMany(fetch=FetchType.EAGER, cascade=CascadeType.PERSIST)
-	private List<Student> studentEnrolled = new ArrayList<>();
-	
 	@OneToMany(mappedBy="course",  fetch=FetchType.LAZY)
 	private List<Question> allAvailableQuestions = new ArrayList<>();
 	

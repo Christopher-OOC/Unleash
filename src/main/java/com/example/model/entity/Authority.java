@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -33,7 +32,7 @@ public class Authority {
 	public Authority(String name) {
 		this.name = name;
 	}
-
+	
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)

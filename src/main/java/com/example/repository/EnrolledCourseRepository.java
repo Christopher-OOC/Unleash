@@ -7,4 +7,5 @@ import com.example.model.entity.EnrolledCourseId;
 
 public interface EnrolledCourseRepository extends JpaRepository<EnrolledCourse, EnrolledCourseId> {
 
+	EnrolledCourse findByEnrolledCourseId(EnrolledCourseId id);
 }

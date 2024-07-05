@@ -26,6 +26,8 @@ public class EnrolledCourseId implements Serializable {
 		this.studentId = studentId;
 		this.courseId = courseId;
 	}
+	
+	
 
 	@Override
 	public boolean equals(Object obj) {

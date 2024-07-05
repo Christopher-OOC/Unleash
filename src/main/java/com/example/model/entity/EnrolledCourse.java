@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 public class EnrolledCourse {
 	
 	@EmbeddedId
-	private EnrolledCourseId id = new EnrolledCourseId();
+	private EnrolledCourseId enrolledCourseId = new EnrolledCourseId();
 	
 	@ManyToOne
 	@JoinColumn(name="student_id", insertable=false, updatable=false)
@@ -44,11 +44,11 @@ public class EnrolledCourse {
 		if (getClass() != obj.getClass())
 			return false;
 		EnrolledCourse other = (EnrolledCourse) obj;
-		return Objects.equals(id, other.id);
+		return Objects.equals(enrolledCourseId, other.enrolledCourseId);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(id);
+		return Objects.hash(enrolledCourseId);
 	}
 }
