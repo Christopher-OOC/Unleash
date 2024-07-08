@@ -19,6 +19,7 @@ import com.example.model.dto.ExaminationDto;
 import com.example.model.dto.ExaminationQuestionAnswerDto;
 import com.example.model.dto.ExaminationResultDto;
 import com.example.model.entity.Course;
+import com.example.model.entity.EnrolledCourse;
 import com.example.model.entity.Examination;
 import com.example.model.entity.ExaminationId;
 import com.example.model.entity.ExaminationQuestionAnswer;
@@ -82,7 +83,15 @@ public class ExaminationServiceImpl implements ExaminationService {
 		Course course = checkIfCourseExist(courseId);
 
 		// Check if student register for the course
-		if (!student.getCoursesTaken().contains(course)) {
+		boolean isEnrolled = false;
+		for (EnrolledCourse ec : student.getCoursesTaken()) {
+			if (ec.getCourse().equals(course)) {
+				isEnrolled = true;
+				break;
+			}
+		}
+		
+		if (!isEnrolled) {
 			throw new NotRegisteredForTheCourseException(courseId);
 		}
 
