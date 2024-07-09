@@ -16,4 +16,8 @@ public class ResourceNotFoundType {
 	
 	public static final String NO_QUESTION = "No such question found!";
 
+	public static final String NO_SUCH_EXAMINATION = "No such examination found!!!"; 
+	
+	
+
 }

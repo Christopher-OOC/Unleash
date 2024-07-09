@@ -1,21 +1,18 @@
 package com.example.model.entity;
 
-import java.util.ArrayList;
-
-import java.util.List;
+import java.util.Date;
 import java.util.Objects;
 
+import org.hibernate.annotations.CreationTimestamp;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,38 +20,33 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @Entity
-@Table(name="users")
-public class User {
-	
+@Table(name="admins")
+public class Admin {
+
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private long id;
 	
 	@Column(nullable=false)
-	private String publicUserId;
+	private String adminId;
 	
 	@Column(unique=true, nullable=false)
 	private String email;
 	
 	@Column(nullable=false)
-	private String password;
+	private String firstName;
 	
-	//6 Digits Pin
 	@Column(nullable=false)
-	private String pin;
+	private String lastName;
 	
-	private String emailVerificationToken;
+	@Column(nullable=false)
+	private String middleName;
 	
-	private boolean emailVerificationStatus;
+	@OneToOne(fetch=FetchType.EAGER, cascade= {CascadeType.PERSIST, CascadeType.REMOVE})
+	private User user;
 	
-	private String passwordResetToken;
-	
-	@ManyToMany(fetch=FetchType.EAGER)
-	@JoinTable(name="users_roles", 
-		joinColumns=@JoinColumn(name="users_id", referencedColumnName="id"),
-		inverseJoinColumns=@JoinColumn(name="roles_id", referencedColumnName="id")
-	)
-	private List<Role> roles = new ArrayList<>();;
+	@CreationTimestamp
+	private Date dateAdded;
 
 	@Override
 	public boolean equals(Object obj) {
@@ -64,7 +56,7 @@ public class User {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		User other = (User) obj;
+		Admin other = (Admin) obj;
 		return id == other.id;
 	}
 

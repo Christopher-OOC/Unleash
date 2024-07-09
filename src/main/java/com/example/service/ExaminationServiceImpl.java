@@ -37,9 +37,6 @@ import com.example.repository.ExaminationSessionRepository;
 import com.example.repository.QuestionRepository;
 import com.example.repository.StudentRepository;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
 @Service
 public class ExaminationServiceImpl implements ExaminationService {
 
@@ -97,23 +94,27 @@ public class ExaminationServiceImpl implements ExaminationService {
 
 		// Get Current Exam Session
 		ExaminationSession session = checkIfSession(courseId);
-		
-		log.info("Session: {}", session);
 
 		ExaminationId id = new ExaminationId();
 		id.setSessionId(session);
 		id.setStudentId(student);
 		
-		Optional<Examination> previousExam = examinationRepository.findById(id);
+		Examination previousExam = examinationRepository.findByExaminationId(id);
 		
-		if (!previousExam.isEmpty()) {
-			throw new ExaminationNoLongerAvailableException();
+		if (previousExam != null) {
+			if (previousExam.getStatus() == ExaminationStatus.ENDED) {
+				throw new ExaminationNoLongerAvailableException();
+			}
+			else if (previousExam.getStatus() == ExaminationStatus.ONGOING) {
+				throw new OngoingExaminationException("The examination is ongoing!!!");
+			}
 		}
-
+		
+		// If no previous examination
+		
 		// Get List of Questions
 		List<Question> questions = questionRepository.getExaminationQuestions(courseId, numberOfExaminationQuestion);
 		
-		log.info("Question: {}", questions);
 		// Create new Examination
 		Examination newExamination = new Examination();
 		newExamination.setExaminationId(id);
@@ -169,11 +170,11 @@ public class ExaminationServiceImpl implements ExaminationService {
 	public ExaminationDto endExamination(String courseId, String studentId) {
 		checkIfCourseExist(courseId);
 
-		// Get Current Exam Session
-		ExaminationSession session = checkIfSession(courseId);
-
 		// Get Student
 		Student student = checkIfStudentExist(studentId);
+		
+		// Get Current Exam Session
+		ExaminationSession session = checkIfSession(courseId);
 
 		// Get Examination
 		ExaminationId id = new ExaminationId();
@@ -197,7 +198,7 @@ public class ExaminationServiceImpl implements ExaminationService {
 		Optional<Examination> optionalExamination = examinationRepository.findById(id);
 
 		if (optionalExamination.isEmpty()) {
-			throw new NoResourceFoundException(ResourceNotFoundType.NO_ONGOING_EXAM);
+			throw new NoResourceFoundException(ResourceNotFoundType.NO_SUCH_EXAMINATION);
 		}
 		
 		Examination examination = optionalExamination.get();

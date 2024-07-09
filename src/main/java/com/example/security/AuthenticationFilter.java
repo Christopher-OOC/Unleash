@@ -84,7 +84,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 		
 		User currentUser = optional.get();
 		
-		userId = currentUser.getUserId();
+		userId = currentUser.getPublicUserId();
 		
 		String token = Jwts
 			.builder()

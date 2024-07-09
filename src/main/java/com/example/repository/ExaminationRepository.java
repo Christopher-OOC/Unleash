@@ -6,5 +6,7 @@ import com.example.model.entity.Examination;
 import com.example.model.entity.ExaminationId;
 
 public interface ExaminationRepository extends JpaRepository<Examination, ExaminationId> {
+	                                                            
+	Examination findByExaminationId(ExaminationId id);
 
 }

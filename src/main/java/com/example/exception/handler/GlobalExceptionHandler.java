@@ -132,13 +132,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	}
 	
 	@ExceptionHandler(OngoingExaminationException.class)
-	@ResponseStatus(HttpStatus.NO_CONTENT)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	public ErrorMessage handleOngoingExaminationException(HttpServletRequest request,
 			OngoingExaminationException ex) {
 
 		ErrorMessage error = new ErrorMessage();
 
-		error.setStatus(HttpStatus.NO_CONTENT.value());
+		error.setStatus(HttpStatus.BAD_REQUEST.value());
 		error.setPath(request.getServletPath());
 		System.out.println(ex.getMessage());
 		error.setMessage(ex.getMessage());

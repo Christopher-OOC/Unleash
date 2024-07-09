@@ -79,7 +79,7 @@ public class StudentServiceImpl implements StudentService {
 		
 		User user = new User();
 		user.setEmail(dto.getEmail());
-		user.setUserId(student.getStudentId());
+		user.setPublicUserId(student.getStudentId());
 		user.setEmailVerificationStatus(false);
 		user.setEmailVerificationToken(null);
 		user.setPassword(passwordEncoder.encode(dto.getPassword()));

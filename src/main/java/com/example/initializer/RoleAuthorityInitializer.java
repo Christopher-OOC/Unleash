@@ -1,4 +1,4 @@
-package com.example.config;
+package com.example.initializer;
 
 import java.util.List;
 import java.util.Optional;
@@ -6,18 +6,22 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import com.example.model.entity.Admin;
 import com.example.model.entity.Authority;
 import com.example.model.entity.Role;
 import com.example.model.entity.User;
-import com.example.model.entity.UserType;
+import com.example.repository.AdminRepository;
 import com.example.repository.AuthorityRepository;
 import com.example.repository.RoleRepository;
 import com.example.repository.UserRepository;
 import com.example.utilities.PinEncoderUtils;
+import com.example.utilities.PublicIdGeneratorUtils;
 
 import java.util.Arrays;
+import java.util.Date;
 
 @Component
 public class RoleAuthorityInitializer {
@@ -29,7 +33,13 @@ public class RoleAuthorityInitializer {
 	private AuthorityRepository authorityRepository;
 	
 	@Autowired
+	private AdminRepository adminRepository;
+	
+	@Autowired
 	private UserRepository userRepository;
+	
+	@Autowired
+	private BCryptPasswordEncoder passwordEncoder;
 	
 	private static final String SUPER_ADMIN_EMAIL = "olojedechristopher24@gmail.com";
 	
@@ -74,17 +84,28 @@ public class RoleAuthorityInitializer {
 		
 		if (optional.isEmpty()) {
 			
-			User superAdmin = new User();
-			superAdmin.setEmail("olojedechristopher24@gmail.com");
-			superAdmin.setEmailVerificationStatus(true);
-			superAdmin.setEmailVerificationToken(null);
-			superAdmin.setPassword("christopher");
-			superAdmin.setPasswordResetToken(null);	
-			superAdmin.setPin(PinEncoderUtils.encodePin("12345"));
+			Admin admin = new Admin();
+			admin.setAdminId(PublicIdGeneratorUtils.generateId(30));
+			admin.setEmail(SUPER_ADMIN_EMAIL);
+			admin.setFirstName("Olamide");
+			admin.setLastName("Olojede");
+			admin.setMiddleName("Christopher");
+			admin.setDateAdded(new Date());
 			
-			superAdmin.getRoles().add(superAdminRole);
+			User user = new User();
+			user.setEmail(SUPER_ADMIN_EMAIL);
+			user.setPublicUserId(admin.getAdminId());
+			user.setEmailVerificationStatus(true);
+			user.setEmailVerificationToken(null);
+			user.setPassword(passwordEncoder.encode("christopher"));
+			user.setPasswordResetToken(null);	
+			user.setPin(PinEncoderUtils.encodePin("12345"));
 			
-			userRepository.save(superAdmin);
+			user.getRoles().add(superAdminRole);
+			
+			admin.setUser(user);
+			
+			adminRepository.save(admin);
 		}
 	}
 

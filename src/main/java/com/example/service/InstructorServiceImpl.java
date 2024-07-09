@@ -75,7 +75,7 @@ public class InstructorServiceImpl implements InstructorService {
 		
 		User userInstructor = new User();
 		userInstructor.setEmail(instructorDto.getEmail());
-		userInstructor.setUserId(instructor.getInstructorId());
+		userInstructor.setPublicUserId(instructor.getInstructorId());
 		userInstructor.setEmailVerificationStatus(true);
 		userInstructor.setEmailVerificationToken(TokenGenerators.generateEmailVerificationToken(instructorDto.getEmail()));
 		userInstructor.setPassword(passwordEncoder.encode(instructorDto.getPassword()));
