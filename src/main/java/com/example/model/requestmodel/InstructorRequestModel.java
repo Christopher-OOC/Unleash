@@ -1,13 +1,16 @@
 package com.example.model.requestmodel;
+import java.util.Date;
 import java.util.Objects;
 
 import org.hibernate.validator.constraints.Length;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Past;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -20,6 +23,10 @@ public class InstructorRequestModel {
 	@NotBlank(message="Full name cannot be empty")
 	@Length(min=5, max=50, message="Full name must have between 5-50 characters")
 	private String fullName;
+	
+	@Past(message="Date of birth must be in the past")
+	@JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd")
+	private Date dateOfBirth;
 	
 	@NotNull(message="Email cannot be null")
 	@NotBlank(message="Email cannot be empty")

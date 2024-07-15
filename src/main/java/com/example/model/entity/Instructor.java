@@ -38,6 +38,9 @@ public class Instructor {
 	@Column(length=50)
 	private String fullName;
 	
+	@Temporal(TemporalType.DATE)
+	private Date dateOfBirth;
+	
 	@Column(unique=true)
 	private String email;
 	

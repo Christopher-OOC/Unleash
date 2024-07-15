@@ -21,6 +21,8 @@ public class InstructorDto {
 	
 	private String fullName;
 	
+	private Date dateOfBirth;
+	
 	private String email;
 	
 	private String password;
