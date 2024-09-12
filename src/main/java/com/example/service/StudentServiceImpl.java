@@ -80,7 +80,7 @@ public class StudentServiceImpl implements StudentService {
 		User user = new User();
 		user.setEmail(dto.getEmail());
 		user.setPublicUserId(student.getStudentId());
-		user.setEmailVerificationStatus(false);
+		user.setEmailVerificationStatus(true);
 		user.setEmailVerificationToken(null);
 		user.setPassword(passwordEncoder.encode(dto.getPassword()));
 		user.setPasswordResetToken(null);
@@ -162,8 +162,7 @@ public class StudentServiceImpl implements StudentService {
 	@Override
 	public void enrollForACourse(String studentId, String courseId) {
 		StudentDto studentDto = checkIfStudentExist(studentId);
-		
-		
+
 		CourseDto courseDto = checkIfCourseExist(courseId);
 		
 		EnrolledCourseId enrolledCourseId = new EnrolledCourseId();
@@ -179,7 +178,7 @@ public class StudentServiceImpl implements StudentService {
 		Student student = modelMapper.map(studentDto, Student.class);
 
 		Course course = modelMapper.map(courseDto, Course.class);
-		
+
 		EnrolledCourse newEnrolledCourse = new EnrolledCourse();
 		newEnrolledCourse.setEnrolledCourseId(enrolledCourseId);
 		newEnrolledCourse.setCourse(course);

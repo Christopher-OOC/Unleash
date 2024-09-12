@@ -48,7 +48,7 @@ public class InstructorServiceImpl implements InstructorService {
 		
 	private BCryptPasswordEncoder passwordEncoder;
 
-	private ModelMapper modelMapper;
+	private ModelMapper modelMapper;;
 	
 	
 	private Map<String, Object> propertyMap = Map.of("course_code", "courseCode", "course_name", "courseName",

@@ -75,6 +75,7 @@ public class InstructorApiController {
 	@PostMapping
 	public ResponseEntity<?> registerAsAnInstructor(@RequestBody @Valid InstructorRequestModel requestModel) {
 		// Check if password and confirmPassword are the same
+		System.out.println("Hello");
 
 		if (!requestModel.getPassword().equals(requestModel.getConfirmPassword())) {
 			throw new BadRequestException("Password not the same!");

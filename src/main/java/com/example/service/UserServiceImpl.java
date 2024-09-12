@@ -2,7 +2,10 @@ package com.example.service;
 
 import java.util.Optional;
 
+import com.example.security.UserPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.example.exceptions.NoResourceFoundException;
@@ -28,4 +31,16 @@ public class UserServiceImpl implements UserService {
 		return optional.get();
 	}
 
+	@Override
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		Optional<User> optional = userRepository.findByEmail(username);
+
+		if (optional.isEmpty()) {
+			throw new UsernameNotFoundException("No such user with username: " + username);
+		}
+
+		User userEntity = optional.get();
+
+		return new UserPrincipal(userEntity);
+	}
 }

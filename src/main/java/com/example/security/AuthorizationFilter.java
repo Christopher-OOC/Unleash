@@ -2,16 +2,15 @@ package com.example.security;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.Optional;
 
+import com.example.demo.CustomApplicationContext;
+import com.example.service.UserServiceImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.stereotype.Component;
 
 import com.example.model.entity.User;
-import com.example.repository.UserRepository;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwt;
@@ -26,14 +25,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
-@Component
 public class AuthorizationFilter extends BasicAuthenticationFilter {
-	
-	private UserRepository userRepository;
 
-	public AuthorizationFilter(AuthenticationManager authenticationManager, UserRepository userRepository) {
+	public AuthorizationFilter(AuthenticationManager authenticationManager) {
 		super(authenticationManager);
-		this.userRepository = userRepository;
 	}
 
 	@Override
@@ -42,6 +37,8 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
 
 		String authorizationHeader = request.getHeader("Authorization");
 
+		System.out.println("Test 5");
+
 		if (authorizationHeader == null
 				|| !authorizationHeader.startsWith(SecurityConstants.AUTHORIZATION_HEADER_PREFIX)) {
 			chain.doFilter(request, response);
@@ -49,9 +46,11 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
 			return;
 		}
 
+		System.out.println("Test 6");
 		UsernamePasswordAuthenticationToken authentication = getAuthentication(authorizationHeader);
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 		chain.doFilter(request, response);
+		System.out.println("Test 7");
 	}
 
 	private UsernamePasswordAuthenticationToken getAuthentication(String token) {
@@ -79,17 +78,17 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
 		if (email == null) {
 			return null;
 		}
-		
-		Optional<User> optional = userRepository.findByEmail(email);
-		
-		if (optional.isEmpty()) {
+
+		UserServiceImpl userService = (UserServiceImpl) CustomApplicationContext.getServiceBean("userServiceImpl");
+
+		User user = userService.findUserByEmail(email);
+
+		if (user == null) {
 
 			return null;
 		}
 		
-		User currentUser = optional.get();
-		
-		UserPrincipal userPrincipal = new UserPrincipal(currentUser);
+		UserPrincipal userPrincipal = new UserPrincipal(user);
 		
 		return new UsernamePasswordAuthenticationToken(userPrincipal.getUsername(), null, userPrincipal.getAuthorities());
 	}
