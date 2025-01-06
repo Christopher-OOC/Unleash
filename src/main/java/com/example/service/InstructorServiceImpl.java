@@ -1,9 +1,6 @@
 package com.example.service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Arrays;
+import java.util.*;
 
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -124,9 +121,14 @@ public class InstructorServiceImpl implements InstructorService {
 		if (coursePage.getContent().isEmpty()) {
 			throw new NoResourceFoundException(ResourceNotFoundType.NO_COURSE);
 		}
-		
-		java.lang.reflect.Type typeToken = new TypeToken<List<CourseDto>>() {}.getType();
-		List<CourseDto> listDto = modelMapper.map(coursePage.getContent(), typeToken);
+
+		List<Course> courses = coursePage.getContent();
+
+		List<CourseDto> listDto = new ArrayList<>();
+
+		for (Course course : courses) {
+			listDto.add(modelMapper.map(course, CourseDto.class));
+		}
 
 		return new PageImpl<>(listDto, pageable, coursePage.getTotalElements());
 	}

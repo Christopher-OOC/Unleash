@@ -31,7 +31,6 @@ public class FilterStudentRepositoryImpl implements FilterStudentRepository {
 		
 		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 		CriteriaQuery<Student> query = builder.createQuery(Student.class);
-		
 		Root<Student> root = query.from(Student.class);
 		
 		// Create WHERE CLAUSE
@@ -84,20 +83,19 @@ public class FilterStudentRepositoryImpl implements FilterStudentRepository {
 	}
 
 	private Long getTotalElements(String search) {
+
 		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 		CriteriaQuery<Long> query = builder.createQuery(Long.class);
-		
 		Root<Student> root = query.from(Student.class);
-		
+
 		createWhereClause(builder, query, root, search);
-		
+
 		query.select(builder.count(root));
-		
+
 		TypedQuery<Long> typedQuery = entityManager.createQuery(query);
-		
+
 		long totalElements = typedQuery.getSingleResult();
-		
+
 		return totalElements;
 	}
-	
 }

@@ -1,5 +1,6 @@
 package com.example.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -99,14 +100,16 @@ public class CourseServiceImpl implements CourseService {
 		Pageable pageable = PageRequest.of(pageNum, pageSize, sort);
 		
 		Page<Course> returnPage = courseRepository.getAllCourses(pageable, filterField);
+
+		List<Course> courses = returnPage.getContent();
+
+		List<CourseDto> listDto = new ArrayList<>();
+
+		for (Course course : courses) {
+			listDto.add(modelMapper.map(course, CourseDto.class));
+		}
 		
-		List<Course> list = returnPage.getContent();
-		
-		java.lang.reflect.Type typeToken = new TypeToken<List<CourseDto>> () {}.getType();
-		
-		List<CourseDto> listDto = modelMapper.map(list, typeToken);
-		
-		return new PageImpl<CourseDto>(listDto, pageable, returnPage.getTotalElements());
+		return new PageImpl<>(listDto, pageable, returnPage.getTotalElements());
 	}
 
 }
